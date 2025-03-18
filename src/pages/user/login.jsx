@@ -30,6 +30,7 @@ const login = () => {
 
   const onSubmit = async (data) => {
     let API_URL = import.meta.env.VITE_API_URL;
+    console.log(API_URL);
     if (isLogin) {
       API_URL = API_URL + "/login";
     } else {
@@ -122,7 +123,10 @@ const login = () => {
                         <span>Dont have an account?&nbsp;</span>
                         <span
                           className="cursor-pointer text-nav"
-                          onClick={() => setIsLogin(false)}
+                          onClick={() => {
+                            setIsLogin(false);
+                            reset();
+                          }}
                         >
                           {" "}
                           Register Now
@@ -200,13 +204,14 @@ const login = () => {
                         />
                       </div>
 
-                      
-
                       <div className="mb-3 form-check">
                         <span>Already have an account?&nbsp;</span>
                         <span
                           className="cursor-pointer text-nav"
-                          onClick={() => setIsLogin(true)}
+                          onClick={() => {
+                            setIsLogin(true);
+                            reset();
+                          }}
                         >
                           Login Now
                         </span>
