@@ -1,0 +1,29 @@
+.login-page .brand img
+{
+    width: 100px;
+    aspect-ratio: 3/3;
+}
+.back-btn:hover
+{
+    background-color: transparent;
+}
+.login-section
+{
+    background-image: url('/public/images/loginform.webp');
+    background-position: center;
+    background-size: cover;
+}
+.login-nav
+{
+    background-color: #3f7d58;
+}
+
+.login-page input
+{
+    border: 2px solid #3f7d58;
+}
+
+.login-page form
+{
+    border:1px solid #3f7d58 !important;
+}

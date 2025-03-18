@@ -1,0 +1,52 @@
+body {
+    background-color: #efefef !important;
+    min-height: 100vh;
+    max-width: 100vw;
+    /* overflow-x: hidden; */
+  }
+  
+  .bg-nav {
+    background-color: #3f7d58 !important;
+  }
+  .bg-section {
+    background-color: #efefef;
+  }
+  .bg-button {
+    background-color: #ec5228;
+  }
+  
+  .text-nav {
+    color: #3f7d58;
+  }
+  .text-section {
+    color: #efefef;
+  }
+  .text-button {
+    color: #ec5228;
+  }
+  .text-default {
+    color: #333333;
+  }
+  
+  
+  .cursor-pointer:hover {
+    cursor: pointer !important ;
+  }
+  .transition-all
+  {
+      transition: all 0.3s ease;
+  }
+  .elong:hover
+  {
+      transform: scale(1.1);
+  }
+  
+  .raleway
+  {
+    font-family: "Raleway", sans-serif;
+  }
+  
+  .great
+  {
+    font-family: "Great Vibes", cursive;
+  }
