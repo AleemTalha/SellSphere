@@ -46,15 +46,15 @@ const login = () => {
   const onSubmit = async (data) => {
     let API_URL = import.meta.env.VITE_API_URL;
     console.log(API_URL);
-    if (isLogin === "login") {
-      API_URL = API_URL + "/login";
-    } else if (isLogin === "register") {
-      API_URL = API_URL + "/register";
-    } else if (isLogin === "otp") {
-      API_URL = API_URL + "/register/verify";
-    } else if (isLogin === "password") {
-      API_URL = API_URL + "/register/credentials";
-    }
+    // if (isLogin === "login") {
+    //   API_URL = API_URL + "/login";
+    // } else if (isLogin === "register") {
+    //   API_URL = API_URL + "/register";
+    // } else if (isLogin === "otp") {
+    //   API_URL = API_URL + "/register/verify";
+    // } else if (isLogin === "password") {
+    //   API_URL = API_URL + "/register/credentials";
+    // }
     const response = await fetch(`${API_URL}`, {
       method: "POST",
       mode: "cors",
