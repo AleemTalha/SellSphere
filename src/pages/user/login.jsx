@@ -58,7 +58,7 @@ const login = () => {
     const response = await fetch(`${API_URL}`, {
       method: "POST",
       mode: "cors",
-      credentials: "include",
+      // credentials: "include",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
