@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { set, useForm } from "react-hook-form";
 import "./login.css";
+import Navbar from "../../components/loginNav/navbar";
 
 const login = () => {
   const navigate = useNavigate();
@@ -125,12 +126,10 @@ const login = () => {
   return (
     <div>
       <ToastContainer />
+      <Navbar/>
       <div className="row m-0 login-page">
         <div className="row p-0 m-0" style={{ minHeight: "110vh" }}>
-          <div className="col-lg-5 pt-5">
-            <div className="text-nav display-4 text-center great mt-lg-5 mt-md-4 mt-3 mb-3">
-              SellSphere
-            </div>
+          <div className="col-lg-5 col-md-6 pt-5">
             <div
               className={`form-container ${
                 isLogin === "login"
@@ -619,14 +618,15 @@ const login = () => {
               )}
             </div>
           </div>
-          <div className="col-lg-7 login-section m-0 p-0 d-none d-lg-block">
+          <div className="col-lg-7 col-md-6 col-sm-4 login-section m-0 p-0 d-none d-md-block">
             <div
-              className="w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center"
+              className="w-100 h-100 d-flex justify-content-center text-center"
               style={{
                 backgroundColor: "rgba(0, 0, 0, 0.85)",
                 padding: "2rem",
               }}
             >
+              <div className="pt-5 mt-5">
               {isLogin === "login" ? (
                 <div className="text-section">
                   <h1
@@ -681,6 +681,7 @@ const login = () => {
                   </p>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </div>

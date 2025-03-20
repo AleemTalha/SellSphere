@@ -14,6 +14,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import Login from "./pages/user/login";
 import Dashboard from "./pages/user/dashboard/dashboard";
+import ContactButton from "./components/ContactButton/ContactButton";
 function App() {
   
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard/>}/>
         </Routes>
+        <ContactButton />
       </Router>
   </>;
 }
