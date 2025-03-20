@@ -9,7 +9,7 @@
 }
 .login-section
 {
-    background-image: url('/public/images/loginform.webp');
+    background-image: url('/images/loginform.webp');
     background-position: center;
     background-size: cover;
 }

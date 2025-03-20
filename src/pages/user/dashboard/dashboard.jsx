@@ -1,19 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const dashboard = () => {
   const [data, setData] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL + "/dashboard";
 
   const fetchData = async () => {
     try {
-      const response = await fetch(
-        "https://mern-project-2-production.up.railway.app/check-dev-mode",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(API_URL, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
       const result = await response.text();
       setData(result);
     } catch (error) {
@@ -21,10 +20,13 @@ const dashboard = () => {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div>
       <h1>Dashboard</h1>
-      <button onClick={fetchData}>Fetch Data</button>
       <div>{data}</div>
     </div>
   );

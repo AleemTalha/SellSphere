@@ -12,13 +12,13 @@ const login = () => {
   const showToast = (message, flag) => {
     if (flag) {
       toast.success(message, {
-        position: "top-right",
-        autoClose: 3000,
+        position: "top-center",
+        autoClose: 5000,
       });
     } else {
       toast.error(message, {
-        position: "top-right",
-        autoClose: 3000,
+        position: "top-center",
+        autoClose: 5000,
       });
     }
   };
@@ -68,19 +68,23 @@ const login = () => {
     const responseData = await response.json();
     showToast(responseData.message, responseData.success);
     reset();
-    if (responseData.success && isLogin === "register") {
-      setIsLogin("otp");
-    } else if (responseData.success && isLogin === "otp") {
-      setIsLogin("password");
-    } else if (!responseData.success && isLogin === "register") {
-      setIsLogin("register");
+    if (responseData.success) {
+      if (isLogin === "register") {
+        setIsLogin("otp");
+      } else if (isLogin === "otp") {
+        setIsLogin("password");
+      } else if (isLogin === "password") {
+        setIsLogin("login");
+      } else if (isLogin === "login") {
+        window.location.href = "/";
+      }
     }
   };
 
   const resendOTP = async () => {
     setTimer(60);
     setCanResend(false);
-    onSubmit();
+    onSubmit("no data");
   };
 
   const validateDOB = (value) => {
@@ -92,8 +96,15 @@ const login = () => {
     return value === watch("password");
   };
 
+  useEffect(() => {
+    document.title = "SellSphere - Login";
+  }, []);
+
   return (
     <div>
+      {/* <Helmet>
+      <title>SellSphere - Login</title>
+      </Helmet> */}
       <ToastContainer />
       <div className="row m-0 login-page">
         <div className="row p-0 m-0" style={{ minHeight: "100vh" }}>
@@ -163,18 +174,8 @@ const login = () => {
                           autoComplete="current-password"
                         />
                       </div>
-                      <div className="mb-3 form-check">
-                        <span>Dont have an account?&nbsp;</span>
-                        <span
-                          className="cursor-pointer text-nav"
-                          onClick={() => {
-                            setIsLogin("register");
-                            reset();
-                          }}
-                        >
-                          {" "}
-                          Register Now
-                        </span>
+                      <div className="text-nav cursor-pointer text-end px-3 text-decoration-underline mb-3">
+                        Forgot Password
                       </div>
                       <button
                         disabled={isSubmitting}
@@ -194,6 +195,21 @@ const login = () => {
                           "Login"
                         )}
                       </button>
+                      <div className="mt-3 form-check">
+                        <span>Don't have an account?&nbsp;</span>
+                        <span
+                          className="cursor-pointer text-nav"
+                          onClick={() => {
+                            setIsLogin("register");
+                            reset();
+                          }}
+                        >
+                          {" "}
+                          <span className="text-decoration-underline">
+                            Register Now
+                          </span>
+                        </span>
+                      </div>
                     </form>
                   </div>
                 </div>
@@ -340,7 +356,8 @@ const login = () => {
                         <button
                           className="border-0"
                           onClick={() => {
-                            isLogin = "register";
+                            setIsLogin("register");
+                            reset();
                             resendOTP();
                           }}
                           disabled={!canResend}
