@@ -27,3 +27,36 @@
 {
     border:1px solid #3f7d58 !important;
 }
+
+.login-btns
+{
+    color: white;
+    border: 2px solid rgb(231, 231, 231) !important;
+}
+.login-btns:hover
+{
+    color: white;
+    background-color: transparent !important;
+    border: 2px solid rgb(231, 231, 231) !important;
+}
+
+.custom-date {
+    position: relative;
+    padding-right: 40px;
+    border-radius: 6px;
+  }
+  
+  .custom-date::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 10px;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+  
+  .input-group-text {
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  

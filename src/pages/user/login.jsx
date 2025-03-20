@@ -1,14 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { set, useForm } from "react-hook-form";
 import "./login.css";
 
 const login = () => {
+  const navigate = useNavigate();
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLogin, setIsLogin] = useState("login");
+  const [isOTPComplete, setIsOTPComplete] = useState(false);
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
+  const otpRefs = useRef(new Array(6).fill(null));
+  const handleOTPInput = (e, index) => {
+    if (e.target.value.length === 1 && index < 5) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+  const handleOTPKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !e.target.value && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+  const validateOtpComplete = () => {
+    const otpValues = otpRefs.current.map((input) => input?.value.trim());
+    const allFilled = !otpValues.includes("");
+    setIsOTPComplete(allFilled);
+  };
+  const combineOTP = () => {
+    const otpValues = otpRefs.current.map((input) => input?.value.trim());
+    return otpValues.join(""); // Combine OTPs into one string
+  };
   const showToast = (message, flag) => {
     if (flag) {
       toast.success(message, {
@@ -51,6 +75,8 @@ const login = () => {
     } else if (isLogin === "register") {
       API_URL = API_URL + "/register";
     } else if (isLogin === "otp") {
+      const otp = combineOTP();
+      data.otp = otp;
       API_URL = API_URL + "/register/verify";
     } else if (isLogin === "password") {
       API_URL = API_URL + "/register/credentials";
@@ -76,38 +102,31 @@ const login = () => {
       } else if (isLogin === "password") {
         setIsLogin("login");
       } else if (isLogin === "login") {
-        window.location.href = "/";
+        navigate("/");
       }
     }
   };
-
   const resendOTP = async () => {
     setTimer(60);
     setCanResend(false);
     onSubmit("no data");
   };
-
   const validateDOB = (value) => {
     const year = new Date(value).getFullYear();
     return year >= 1940 && year <= 2020;
   };
-
   const validatePasswordMatch = (value) => {
     return value === watch("password");
   };
-
   useEffect(() => {
     document.title = "SellSphere - Login";
   }, []);
 
   return (
     <div>
-      {/* <Helmet>
-      <title>SellSphere - Login</title>
-      </Helmet> */}
       <ToastContainer />
       <div className="row m-0 login-page">
-        <div className="row p-0 m-0" style={{ minHeight: "100vh" }}>
+        <div className="row p-0 m-0" style={{ minHeight: "110vh" }}>
           <div className="col-lg-5 pt-5">
             <div className="text-nav display-4 text-center great mt-lg-5 mt-md-4 mt-3 mb-3">
               SellSphere
@@ -129,28 +148,40 @@ const login = () => {
                     <form
                       autoComplete="on"
                       onSubmit={handleSubmit(onSubmit)}
-                      className="p-4 border rounded"
+                      className="p-4 border rounded-4 bg-white"
                       style={{
-                        maxWidth: "400px",
+                        maxWidth: "380px",
                         width: "100%",
-                        boxShadow: "5px 5px 30px rgb(142, 142, 142)",
+                        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
                       }}
                     >
-                      <nav>
-                        <div className="brand d-flex justify-content-center">
-                          <img src="/images/logo1.png" />
-                        </div>
+                      <nav className="d-flex justify-content-center mb-3">
+                        <img
+                          src="/images/logo1.png"
+                          alt="Logo"
+                          style={{ height: "50px" }}
+                        />
                       </nav>
-                      <h3 className="text-center mb-3 pt-3">Login</h3>
+
+                      <h3 className="text-center mb-3 pt-2 fw-bold text-nav">
+                        Welcome Back!
+                      </h3>
+
+                      <p className="text-center mb-4 text-muted">
+                        Please enter your credentials to continue your journey.
+                      </p>
 
                       <div className="mb-3">
-                        <label htmlFor="email" className="form-label">
-                          Email address
+                        <label
+                          htmlFor="email"
+                          className="form-label fw-semibold"
+                        >
+                          Email Address
                         </label>
                         <input
                           type="email"
                           name="email"
-                          className="form-control"
+                          className="form-control rounded-3"
                           id="email"
                           autoComplete="email"
                           required
@@ -160,26 +191,56 @@ const login = () => {
                       </div>
 
                       <div className="mb-3">
-                        <label htmlFor="password" className="form-label">
+                        <label
+                          htmlFor="password"
+                          className="form-label fw-semibold"
+                        >
                           Password
                         </label>
-                        <input
-                          {...register("password")}
-                          type="password"
-                          name="password"
-                          className="form-control"
-                          id="password"
-                          required
-                          minLength={8}
-                          autoComplete="current-password"
-                        />
+                        <div className="position-relative">
+                          <input
+                            {...register("password")}
+                            type={passwordVisible ? "text" : "password"}
+                            name="password"
+                            className="form-control rounded-3"
+                            id="password"
+                            required
+                            minLength={8}
+                            autoComplete="current-password"
+                          />
+                          <button
+                            type="button"
+                            className="position-absolute top-50 end-0 translate-middle-y bg-nav border-0 text-light rounded-3 p-2"
+                            onClick={() => setPasswordVisible(!passwordVisible)}
+                            style={{
+                              right: "10px",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              background: "none",
+                              border: "none",
+                            }}
+                          >
+                            <i
+                              className={`bi ${
+                                passwordVisible ? "bi-eye-slash" : "bi-eye"
+                              } fs-5`}
+                            />
+                          </button>
+                        </div>
+                        <small className="form-text text-muted">
+                          Your password must be at least 8 characters.
+                        </small>
                       </div>
-                      <div className="text-nav cursor-pointer text-end px-3 text-decoration-underline mb-3">
-                        Forgot Password
+
+                      <div className="text-end">
+                        <span className="text-nav cursor-pointer text-decoration-underline">
+                          Forgot Password?
+                        </span>
                       </div>
+
                       <button
                         disabled={isSubmitting}
-                        className="btn w-100 border border-2 bg-nav text-light"
+                        className="btn w-100 bg-nav text-light rounded-3 mt-3 fw-semibold"
                         type="submit"
                       >
                         {isSubmitting ? (
@@ -189,132 +250,139 @@ const login = () => {
                               role="status"
                               aria-hidden="true"
                             ></span>
-                            <span> Please Wait</span>
+                            <span>
+                              {" "}
+                              Authenticating...
+                            </span>
                           </div>
                         ) : (
                           "Login"
                         )}
                       </button>
-                      <div className="mt-3 form-check">
-                        <span>Don't have an account?&nbsp;</span>
-                        <span
-                          className="cursor-pointer text-nav"
-                          onClick={() => {
-                            setIsLogin("register");
-                            reset();
-                          }}
-                        >
-                          {" "}
-                          <span className="text-decoration-underline">
-                            Register Now
+
+                      <div className="mt-4 text-center text-muted">
+                        <p>
+                          New here?{" "}
+                          <span
+                            onClick={()=> setIsLogin("register")}
+                            className="text-nav text-decoration-underline cursor-pointer"
+                          >
+                            Create an account
                           </span>
-                        </span>
+                        </p>
                       </div>
                     </form>
                   </div>
                 </div>
-              ) : isLogin === "register" ? (
-                <div className="form-content slide-in">
-                  <div className="d-flex justify-content-center align-items-center">
-                    <form
-                      autoComplete="on"
-                      onSubmit={handleSubmit(onSubmit)}
-                      className="p-4 border rounded"
-                      style={{
-                        maxWidth: "400px",
-                        width: "100%",
-                        boxShadow: "5px 5px 30px rgb(142, 142, 142)",
-                      }}
-                    >
-                      <nav>
-                        <div className="brand d-flex justify-content-center">
-                          <img src="/images/logo1.png" />
-                        </div>
-                      </nav>
-                      <h3 className="text-center mb-3 pt-3">Register</h3>
-
-                      <div className="row">
-                        <div className="col-6 mb-3">
-                          <label htmlFor="firstName" className="form-label">
-                            First Name
-                          </label>
-                          <input
-                            type="text"
-                            name="firstName"
-                            className="form-control"
-                            id="firstName"
-                            required
-                            minLength={2}
-                            {...register("firstName")}
-                          />
-                        </div>
-
-                        <div className="col-6 mb-3">
-                          <label htmlFor="lastName" className="form-label">
-                            Last Name
-                          </label>
-                          <input
-                            type="text"
-                            name="lastName"
-                            className="form-control"
-                            id="lastName"
-                            required
-                            minLength={2}
-                            {...register("lastName")}
-                          />
-                        </div>
+              ) : isLogin === "register" ? (<div className="form-content slide-in">
+                <div className="d-flex justify-content-center align-items-center">
+                  <form
+                    autoComplete="on"
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="p-4 border rounded"
+                    style={{
+                      maxWidth: "400px",
+                      width: "100%",
+                      boxShadow: "5px 5px 30px rgb(142, 142, 142)",
+                    }}
+                  >
+                    <nav>
+                      <div className="brand d-flex justify-content-center">
+                        <img src="/images/logo1.png" />
                       </div>
-
-                      <div className="mb-3">
-                        <label htmlFor="email" className="form-label">
-                          Email address
+                    </nav>
+                    <h3 className="text-center mb-3 pt-3">Create Your Account</h3>
+              
+                    <p className="text-center mb-3 text-muted">
+                      Join us and start your journey with us. It's quick and easy!
+                    </p>
+              
+                    <div className="row">
+                      <div className="col-6 mb-3">
+                        <label htmlFor="firstName" className="form-label">
+                          First Name
                         </label>
                         <input
-                          type="email"
-                          name="email"
+                          type="text"
+                          name="firstName"
                           className="form-control"
-                          id="email"
-                          autoComplete="email"
+                          id="firstName"
                           required
-                          minLength={5}
-                          {...register("email")}
+                          minLength={2}
+                          {...register("firstName")}
                         />
                       </div>
-
-                      <div className="mb-3 form-check">
-                        <span>Already have an account?&nbsp;</span>
-                        <span
-                          className="cursor-pointer text-nav"
-                          onClick={() => {
-                            setIsLogin("login");
-                            reset();
-                          }}
-                        >
-                          Login Now
-                        </span>
+              
+                      <div className="col-6 mb-3">
+                        <label htmlFor="lastName" className="form-label">
+                          Last Name
+                        </label>
+                        <input
+                          type="text"
+                          name="lastName"
+                          className="form-control"
+                          id="lastName"
+                          required
+                          minLength={2}
+                          {...register("lastName")}
+                        />
                       </div>
-
-                      <button
-                        disabled={isSubmitting}
-                        className="btn w-100 border border-2 bg-nav text-light"
-                        type="submit"
+                    </div>
+              
+                    <div className="mb-3">
+                      <label htmlFor="email" className="form-label">
+                        Email address
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        className="form-control"
+                        id="email"
+                        autoComplete="email"
+                        required
+                        minLength={5}
+                        {...register("email")}
+                      />
+                    </div>
+              
+                    <div className="mb-3 form-check">
+                      <span>Already have an account?&nbsp;</span>
+                      <span
+                        className="cursor-pointer text-nav"
+                        onClick={() => {
+                          setIsLogin("login");
+                          reset();
+                        }}
                       >
-                        {isSubmitting ? (
-                          <div>
-                            <span
-                              className="spinner-border spinner-border-sm"
-                              role="status"
-                              aria-hidden="true"
-                            ></span>
-                            <span> Please Wait</span>
-                          </div>
-                        ) : (
-                          "Register"
-                        )}
-                      </button>
-                    </form>
-                  </div>
+                        Login Now
+                      </span>
+                    </div>
+              
+                    <button
+                      disabled={isSubmitting}
+                      className="btn w-100 border border-2 bg-nav text-light"
+                      type="submit"
+                    >
+                      {isSubmitting ? (
+                        <div>
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                          <span> Sending verification code</span>
+                        </div>
+                      ) : (
+                        "Register"
+                      )}
+                    </button>
+              
+                    <p className="text-center mt-4 text-muted">
+                      By signing up, you agree to our <a href="#" className="text-nav">Terms & Conditions</a> and <a href="#" className="text-nav">Privacy Policy</a>.
+                    </p>
+                  </form>
                 </div>
+              </div>
               ) : isLogin === "otp" ? (
                 <div className="form-content slide-in">
                   <div className="d-flex justify-content-center align-items-center">
@@ -341,22 +409,28 @@ const login = () => {
                         <label htmlFor="otp" className="form-label">
                           OTP
                         </label>
-                        <input
-                          type="text"
-                          name="otp"
-                          className="form-control"
-                          id="otp"
-                          required
-                          minLength={6}
-                          maxLength={6}
-                          {...register("otp")}
-                        />
+                        <div className="d-flex justify-content-between">
+                          {Array.from({ length: 6 }).map((_, index) => (
+                            <input
+                              type="text"
+                              name={`otp-${index}`}
+                              className="form-control otp-input"
+                              id={`otp-${index}`}
+                              maxLength={1}
+                              required
+                              ref={(el) => (otpRefs.current[index] = el)}
+                              onKeyUp={(e) => handleOTPInput(e, index)}
+                              onKeyDown={(e) => handleOTPKeyDown(e, index)}
+                              onBlur={validateOtpComplete}
+                            />
+                          ))}
+                        </div>
                       </div>
+
                       <div className="text-center mt-3">
                         <button
                           className="border-0"
                           onClick={() => {
-                            setIsLogin("register");
                             reset();
                             resendOTP();
                           }}
@@ -373,8 +447,9 @@ const login = () => {
                           )}
                         </button>
                       </div>
+
                       <button
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !isOTPComplete}
                         className="btn w-100 border border-2 bg-nav text-light"
                         type="submit"
                       >
@@ -385,7 +460,7 @@ const login = () => {
                               role="status"
                               aria-hidden="true"
                             ></span>
-                            <span> Please Wait</span>
+                            <span> Authenticating code</span>
                           </div>
                         ) : (
                           "Verify OTP"
@@ -400,22 +475,26 @@ const login = () => {
                     <form
                       autoComplete="on"
                       onSubmit={handleSubmit(onSubmit)}
-                      className="p-4 border rounded"
+                      className="p-4 border rounded shadow-lg"
                       style={{
                         maxWidth: "400px",
                         width: "100%",
-                        boxShadow: "5px 5px 30px rgb(142, 142, 142)",
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                       }}
                     >
                       <nav>
-                        <div className="brand d-flex justify-content-center">
-                          <img src="/images/logo1.png" />
+                        <div className="brand d-flex justify-content-center mb-4">
+                          <img src="/images/logo1.png" alt="Logo" width="120" />
                         </div>
                       </nav>
-                      <h3 className="text-center mb-3 pt-3">Set Password</h3>
+                      <h3 className="text-center text-dark mb-4">
+                        Set Your Secure Password
+                      </h3>
 
                       <div className="mb-3">
-                        <label htmlFor="dob" className="form-label">
+                        <label htmlFor="dob" className="form-label text-muted">
                           Date of Birth
                         </label>
                         <input
@@ -434,35 +513,79 @@ const login = () => {
                       </div>
 
                       <div className="mb-3">
-                        <label htmlFor="password" className="form-label">
+                        <label
+                          htmlFor="password"
+                          className="form-label text-muted"
+                        >
                           Password
                         </label>
-                        <input
-                          type="password"
-                          name="password"
-                          className="form-control"
-                          id="password"
-                          required
-                          minLength={8}
-                          {...register("password")}
-                        />
+                        <div className="input-group">
+                          <input
+                            type="password"
+                            name="password"
+                            className="form-control"
+                            id="password"
+                            required
+                            minLength={8}
+                            placeholder="Enter a strong password"
+                            {...register("password")}
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={() => {
+                              const passwordField =
+                                document.getElementById("password");
+                              const type =
+                                passwordField.type === "password"
+                                  ? "text"
+                                  : "password";
+                              passwordField.type = type;
+                            }}
+                            style={{ borderRadius: "0 4px 4px 0" }}
+                          >
+                            <i className="bi bi-eye" aria-hidden="true"></i>
+                          </button>
+                        </div>
                       </div>
 
                       <div className="mb-3">
-                        <label htmlFor="confirmPassword" className="form-label">
+                        <label
+                          htmlFor="confirmPassword"
+                          className="form-label text-muted"
+                        >
                           Confirm Password
                         </label>
-                        <input
-                          type="password"
-                          name="confirmPassword"
-                          className="form-control"
-                          id="confirmPassword"
-                          required
-                          minLength={8}
-                          {...register("confirmPassword", {
-                            validate: validatePasswordMatch,
-                          })}
-                        />
+                        <div className="input-group">
+                          <input
+                            type="password"
+                            name="confirmPassword"
+                            className="form-control"
+                            id="confirmPassword"
+                            required
+                            minLength={8}
+                            placeholder="Re-enter your password"
+                            {...register("confirmPassword", {
+                              validate: validatePasswordMatch,
+                            })}
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={() => {
+                              const confirmPasswordField =
+                                document.getElementById("confirmPassword");
+                              const type =
+                                confirmPasswordField.type === "password"
+                                  ? "text"
+                                  : "password";
+                              confirmPasswordField.type = type;
+                            }}
+                            style={{ borderRadius: "0 4px 4px 0" }}
+                          >
+                            <i className="bi bi-eye" aria-hidden="true"></i>
+                          </button>
+                        </div>
                         {errors.confirmPassword && (
                           <span className="text-danger">
                             Passwords do not match
@@ -470,24 +593,26 @@ const login = () => {
                         )}
                       </div>
 
-                      <button
-                        disabled={isSubmitting}
-                        className="btn w-100 border border-2 bg-nav text-light"
-                        type="submit"
-                      >
-                        {isSubmitting ? (
-                          <div>
-                            <span
-                              className="spinner-border spinner-border-sm"
-                              role="status"
-                              aria-hidden="true"
-                            ></span>
-                            <span> Please Wait</span>
-                          </div>
-                        ) : (
-                          "Set Password"
-                        )}
-                      </button>
+                      <div className="text-center mt-4">
+                        <button
+                          disabled={isSubmitting}
+                          className="btn w-100 border border-2 bg-nav text-light"
+                          type="submit"
+                        >
+                          {isSubmitting ? (
+                            <div>
+                              <span
+                                className="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                              ></span>
+                              <span> Please wait, processing...</span>
+                            </div>
+                          ) : (
+                            "Set Password"
+                          )}
+                        </button>
+                      </div>
                     </form>
                   </div>
                 </div>
@@ -495,7 +620,68 @@ const login = () => {
             </div>
           </div>
           <div className="col-lg-7 login-section m-0 p-0 d-none d-lg-block">
-            <div className="w-100 h-100"></div>
+            <div
+              className="w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center"
+              style={{
+                backgroundColor: "rgba(0, 0, 0, 0.85)",
+                padding: "2rem",
+              }}
+            >
+              {isLogin === "login" ? (
+                <div className="text-section">
+                  <h1
+                    className="display-2 text-nav"
+                    style={{ fontWeight: "400" }}
+                  >
+                    Welcome Back!
+                  </h1>
+                  <p className="fs-6 text-light mt-2">
+                    We missed you! Unlock new possibilities and pick up right
+                    where you left off. Don’t have an account yet? Join us today
+                    and be part of something amazing!
+                  </p>
+                  <button
+                    className="bg-nav rounded-3 px-4 py-2 login-btns transition-all elong mt-3 fw-semibold fs-6 shadow-sm"
+                    onClick={() => setIsLogin("register")}
+                  >
+                    Register Now
+                  </button>
+                </div>
+              ) : isLogin === "register" ? (
+                <div className="text-section">
+                  <h1
+                    className="display-2 text-nav"
+                    style={{ fontWeight: "400" }}
+                  >
+                    Join the Community!
+                  </h1>
+                  <p className="fs-6 text-light mt-2">
+                    Step into a world of opportunities! Sign up now and
+                    experience the best. Already have an account? Log in and
+                    keep the journey going!
+                  </p>
+                  <button
+                    className="bg-nav rounded-3 px-4 py-2 login-btns transition-all elong mt-3 fw-semibold fs-6 shadow-sm"
+                    onClick={() => setIsLogin("login")}
+                  >
+                    Log In Now
+                  </button>
+                </div>
+              ) : (
+                <div className="text-section">
+                  <h1
+                    className="display-2 text-nav"
+                    style={{ fontWeight: "400" }}
+                  >
+                    Welcome to SellSphere!
+                  </h1>
+                  <p className="fs-6 text-light mt-2">
+                    Your journey starts here. Follow the steps to complete your
+                    registration and open doors to endless opportunities!
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
