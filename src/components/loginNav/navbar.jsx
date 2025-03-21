@@ -7,7 +7,7 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
       <div className="container-fluid">
         <NavLink className="navbar-brand" to="/">
-          <img src="/public/images/logo2.png" className="logo-2" alt="Logo" />
+          <img src="  /images/logo2.png" className="logo-2" alt="Logo" />
         </NavLink>
         <button
           className="navbar-toggler"
@@ -20,7 +20,7 @@ const Navbar = () => {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
+        <div className="collapse navbar-collapse text-center" id="navbarNav">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
               <NavLink

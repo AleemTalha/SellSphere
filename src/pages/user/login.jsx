@@ -67,7 +67,6 @@ const login = () => {
       setCanResend(true);
     }
   }, [isLogin, timer]);
-
   const onSubmit = async (data) => {
     let API_URL = import.meta.env.VITE_API_URL;
     console.log(API_URL);

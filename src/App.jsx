@@ -11,6 +11,7 @@ const Login = lazy(() => import("./pages/user/login"));
 const Dashboard = lazy(() => import("./pages/user/dashboard/dashboard"));
 const ErrorPage = lazy(() => import("./pages/error/ErrorPage"));
 import Loading from "./components/loading";
+const ForgotEmail = lazy(()=> import("./pages/user/forgotPassword/forgot"))
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
+          <Route path="/forgot-password" element={<ForgotEmail />} />
           <Route path="*" element={<ErrorPage />} />{" "}
         </Routes>
       </Suspense>
