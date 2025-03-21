@@ -128,7 +128,7 @@ const login = () => {
       <ToastContainer />
       <Navbar/>
       <div className="row m-0 login-page">
-        <div className="row p-0 m-0" style={{ minHeight: "110vh" }}>
+        <div className="row p-0 m-0" style={{ minHeight: "730px" }}>
           <div className="col-lg-5 col-md-6 pt-5">
             <div
               className={`form-container ${

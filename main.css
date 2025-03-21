@@ -18,6 +18,12 @@ body {
 .text-nav {
   color: #3f7d58;
 }
+
+.logo-2 {
+  width: 120px;
+  aspect-ratio: 7/3;
+}
+
 .text-section {
   color: #efefef;
 }

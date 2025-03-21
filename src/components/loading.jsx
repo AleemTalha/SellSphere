@@ -1,30 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
+import "./loading.css";
 
-const loading = () => {
+const Loading = () => {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    document.body.style.pointerEvents = "none"; // Disable all pointer events
+    return () => {
+      document.body.style.overflow = "auto";
+      document.body.style.pointerEvents = "auto"; // Re-enable pointer events
+    };
+  }, []);
+
   return (
-    <div>
-      <div
-        className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-nav text-btn"
-        style={{ zIndex: 1050 }}
-      >
-        <div className="d-flex">
-          <div
-            className="spinner-grow text-primary mx-2"
-            style={{ width: "3rem", height: "3rem" }}
-          ></div>
-          <div
-            className="spinner-grow text-danger mx-2"
-            style={{ width: "3rem", height: "3rem" }}
-          ></div>
-          <div
-            className="spinner-grow text-success mx-2"
-            style={{ width: "3rem", height: "3rem" }}
-          ></div>
-        </div>
-        <h2 className="mt-4 fw-bold">Please Wait...</h2>
+    <div className="loading-overlay">
+      <div className="loading-spinner">
+        <div className="spinner"></div>
       </div>
+      <h2 className="loading-text">
+        Loading
+        <span className="dot">.</span>
+        <span className="dot">.</span>
+        <span className="dot">.</span>
+      </h2>
     </div>
   );
 };
 
-export default loading;
+export default Loading;
