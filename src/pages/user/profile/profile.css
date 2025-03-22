@@ -13,26 +13,26 @@
 
 .upload-form {
   background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  max-width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 90%;
+  max-width: 500px;
+  text-align: center;
 }
 
 .drop-area {
   position: relative;
-  border: 2px dashed #007bff;
+  border: 2px dashed #3f7d58;
   border-radius: 10px;
   padding: 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  transition: background 0.3s ease;
 }
 
 .drop-area:hover {
-  background-color: #f0f8ff;
+  background: #f3f3f3;
 }
 
 .drop-area img {
@@ -47,11 +47,22 @@
   display: none;
 }
 
+.preview-image {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
 .upload-icons {
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 15px;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.upload-icons .btn {
+  width: 48%;
 }
 
 .upload-icons button {
@@ -113,12 +124,10 @@
 }
 
 .profile-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: calc(
-    100vh - 70px
-  ); 
+  background: gray;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  width: 90%;
   background: #f0f2f5;
   padding-top: 20px;
 }
@@ -148,8 +157,9 @@
 }
 
 .skeleton-image {
-  width: 150px;
-  height: 150px;
+  width: -100%;
+  height: 100%;
+
   border-radius: 50%;
   margin-bottom: 20px;
 }

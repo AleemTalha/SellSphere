@@ -42,12 +42,12 @@ const Contact = () => {
     <>
       <ToastContainer />
       <nav className="navbar d-flex justify-content-between navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
-        <NavLink to="/dashboard" className="brand">
+        <NavLink to="/" className="brand">
           <img src="/images/logo2.png" alt="logo" className="logo-2" />
         </NavLink>
         <div className="nav-links d-flex gap-2">
           <NavLink
-            to="/dashboard"
+            to="/"
             className="btn  elong transition-all nav-link text-light text-decoration-none"
           >
             Home

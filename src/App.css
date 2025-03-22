@@ -1,0 +1,19 @@
+.nav-link {
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+  background-color: #3f7d58;
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.nav-link.bg-nav {
+  background-color: #3f7d58;
+  color: #fff;
+}
+
+.nav-link.bg-nav:hover {
+  background-color: #6da47c;
+  color: #fff !important;
+}

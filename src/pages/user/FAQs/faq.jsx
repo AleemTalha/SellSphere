@@ -1,13 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-
 const FAQ = () => {
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
         <div className="container-fluid">
-          <NavLink className="navbar-brand" to="/">
-            <img src="/images/logo2.png" className="logo-2" alt="Logo" />
+          <NavLink className="" to="/">
+            <img src="/public/images/logo2.png" className="logo-2" alt="" />
           </NavLink>
           <button
             className="navbar-toggler"

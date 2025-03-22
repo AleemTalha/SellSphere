@@ -1,51 +1,62 @@
-import React, { useState, useEffect } from "react";
-import { useParams, NavLink } from "react-router-dom";
+import React, { useState, useEffect, lazy, Suspense } from "react";
+import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./profile.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaUpload, FaCamera } from "react-icons/fa";
-import Card from "../../../components/card/Card";
+import Loading from "../../../components/loading";
+
+const CardContainer = lazy(() =>
+  import("../../../components/cardContainer/cardContainer")
+);
 
 const Profile = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [imgUrl, setImgUrl] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/profile/profile-id/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
+      if (response.ok) {
+        setUser(result.user);
+        setImgUrl(result.user.profileImage?.url || "/images/default.png");
+        setLoading(false);
+      } else {
+        toast.error(result.message || "Failed to fetch user data");
+        setLoading(false);
+      }
+    } catch (error) {
+      toast.error("Failed to fetch user data: " + error.message);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/profile/profile-id/${id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-        const result = await response.json();
-        if (response.ok) {
-          setUser(result.user);
-          setLoading(false); // Set loading to false after data is fetched
-        } else {
-          toast.error(result.message || "Failed to fetch user data");
-          setLoading(false); // Set loading to false even if there's an error
-        }
-      } catch (error) {
-        toast.error("Failed to fetch user data: " + error.message);
-        setLoading(false); // Set loading to false in case of an error
-      }
-    };
     fetchUserData();
   }, [id]);
 
   const handleImageLoad = () => {
-    setLoading(false);
+    setImageLoading(false);
+    document.body.style.pointerEvents = "auto";
   };
 
   const handleImageClick = () => {
@@ -54,18 +65,22 @@ const Profile = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && file.type.startsWith("image/")) {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
+    } else {
+      toast.error("Please select a valid image file");
     }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file) {
+    if (file && file.type.startsWith("image/")) {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
+    } else {
+      toast.error("Please select a valid image file");
     }
   };
 
@@ -79,6 +94,12 @@ const Profile = () => {
     const formData = new FormData();
     formData.append("image", selectedFile);
 
+    setUploading(true);
+    document.body.style.pointerEvents = "none";
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/update/profile/image`,
@@ -86,68 +107,94 @@ const Profile = () => {
           method: "POST",
           body: formData,
           credentials: "include",
+          signal: controller.signal,
         }
       );
+      clearTimeout(timeoutId);
       const result = await response.json();
       if (response.ok) {
         toast.success("Profile image updated successfully");
-        setUser((prevUser) => ({
-          ...prevUser,
-          profileImage: result.profileImage,
-        }));
+        setImgUrl(result.profileImage); // Update the image URL state
+        setImageLoading(true);
         setShowUploadForm(false);
+        navigate("/"); // Redirect to the dashboard
       } else {
         toast.error(result.message || "Failed to upload image");
       }
     } catch (error) {
-      toast.error("Failed to upload image: " + error.message);
+      if (error.name === "AbortError") {
+        toast.error("Upload timed out. Please try again.");
+      } else {
+        toast.error("Failed to upload image: " + error.message);
+      }
+    } finally {
+      setUploading(false);
+      document.body.style.pointerEvents = "auto";
     }
   };
 
   return (
     <>
       <ToastContainer />
-      <nav className="bg-nav navbar navbar-expand-lg navbar-light">
-        <div className="container-fluid">
-          <NavLink className="navbar-brand" to="/">
-            <img src="/images/logo2.png" alt="Logo" className="logo-2" />
-          </NavLink>
-          <div className="d-flex">
-            <NavLink to="/" className="btn btn-outline-primary me-2">
-              Home
-            </NavLink>
-            <NavLink to="/profile" className="btn btn-outline-secondary">
-              Profile
-            </NavLink>
-          </div>
+      <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
+        <NavLink to="/" className="brand">
+          <img src="/images/logo2.png" alt="logo" className="logo-2" />
+        </NavLink>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse text-center " id="navbarNav">
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item">
+              <NavLink to="/" className="nav-link bg-nav text-light me-2 text-decoration-none">
+                Home
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/edit-profile"
+                className="nav-link bg-nav text-light text-decoration-none"
+              >
+                Edit Profile
+              </NavLink>
+            </li>
+          </ul>
         </div>
       </nav>
 
-      <div className="profile-container">
-        <div className="profile-content">
+      <div className="profile-container d-flex justify-content-center align-items-center">
+        <div className="profile-content w-100">
           <div className="row align-items-center">
             <div className="col-md-4 text-center">
-              {loading ? (
-                <div className="skeleton skeleton-image"></div>
-              ) : (
-                <div className="profile-image-container">
+              <div className="profile-image-container">
+                {imageLoading ? (
+                  <div className="skeleton skeleton-image"></div>
+                ) : (
                   <img
-                    src={user?.profileImage?.url || "/images/default.png"}
+                    src={imgUrl}
                     alt="Profile"
                     className="profile-image fade-in"
                     onLoad={handleImageLoad}
                     onClick={handleImageClick}
                   />
-                  <div
-                    style={{
-                      backgroundColor: "#3f7d58cc",
-                    }}
-                    className="upload-icon-overlay text-light w-100 h-100 rounded-circle d-flex justify-content-center align-items-center"
-                  >
-                    <FaCamera onClick={handleImageClick} className="fs-3" />
-                  </div>
+                )}
+                <div
+                  style={{
+                    backgroundColor: "#3f7d58cc",
+                  }}
+                  className="upload-icon-overlay text-light w-100 h-100 rounded-circle d-flex justify-content-center align-items-center"
+                >
+                  <FaCamera onClick={handleImageClick} className="fs-3" />
                 </div>
-              )}
+              </div>
             </div>
             <div className="col-md-8">
               <div className="profile-info">
@@ -194,6 +241,19 @@ const Profile = () => {
         </div>
       </div>
 
+      <div className="w-100 mt-4">
+        {user?.posts && user.posts.length > 0 ? (
+          <Suspense fallback={<Loading />}>
+            <CardContainer cards={user.posts} />
+          </Suspense>
+        ) : (
+          <div className="no-ads-message text-center mt-5">
+            <h2>You haven't posted any ads yet.</h2>
+            <p>Start posting ads to see them here.</p>
+          </div>
+        )}
+      </div>
+
       {showUploadForm && (
         <div className="upload-form-container">
           <form onSubmit={handleUpload} className="upload-form">
@@ -205,48 +265,48 @@ const Profile = () => {
             >
               <p>Drag & Drop or Click to Upload</p>
               {preview ? (
-                <img src={preview} alt="Preview" />
+                <img src={preview} alt="Preview" className="preview-image" />
               ) : (
                 <p>📁 Choose an image</p>
               )}
               <input
                 type="file"
                 id="fileInput"
+                accept="image/*"
                 onChange={handleFileChange}
                 style={{ display: "none" }}
               />
             </div>
             <div className="upload-icons">
-              <button type="submit">Upload</button>
-              <button type="button" onClick={() => setShowUploadForm(false)}>
+              <button
+                type="submit"
+                disabled={uploading}
+                className="btn btn-primary"
+              >
+                {uploading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Uploading...
+                  </>
+                ) : (
+                  "Upload"
+                )}
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowUploadForm(false)}
+              >
                 Cancel
               </button>
             </div>
           </form>
         </div>
       )}
-      <div className="card-list">
-        <Card
-          imageUrl="https://via.placeholder.com/150"
-          title="Sample Product 1"
-          price="19.99"
-        />
-        <Card
-          imageUrl="https://via.placeholder.com/150"
-          title="Sample Product 2"
-          price="29.99"
-        />
-        <Card
-          imageUrl="https://via.placeholder.com/150"
-          title="Sample Product 3"
-          price="39.99"
-        />
-        <Card
-          imageUrl="https://via.placeholder.com/150"
-          title="Sample Product 4"
-          price="49.99"
-        />
-      </div>
     </>
   );
 };

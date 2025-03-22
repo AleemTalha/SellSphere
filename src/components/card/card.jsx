@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./card.css";
 
 const Card = ({ imageUrl, title, price }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [textLoaded, setTextLoaded] = useState(false);
+
+  useEffect(() => {
+    const image = new Image();
+    image.src = imageUrl;
+    image.onload = () => setImageLoaded(true);
+    return () => {
+      image.onload = null;
+    };
+  }, [imageUrl]);
 
   return (
     <div className="card">
@@ -13,24 +21,21 @@ const Card = ({ imageUrl, title, price }) => {
         <img
           src={imageUrl}
           alt={title}
-          onLoad={() => setImageLoaded(true)}
           className={`card-img-top ${imageLoaded ? "d-block" : "d-none"}`}
         />
       </div>
       <div className="card-body">
-        {!textLoaded && <div className="skeleton skeleton-text"></div>}
-        <h5
-          className={`card-title ${textLoaded ? "d-block" : "d-none"}`}
-          onLoad={() => setTextLoaded(true)}
-        >
-          {title}
-        </h5>
-        <p
-          className={`card-text ${textLoaded ? "d-block" : "d-none"}`}
-          onLoad={() => setTextLoaded(true)}
-        >
-          ${price}
-        </p>
+        {imageLoaded ? (
+          <>
+            <h5 className="card-title">{title}</h5>
+            <p className="card-text">${price}</p>
+          </>
+        ) : (
+          <>
+            <div className="skeleton skeleton-text"></div>
+            <div className="skeleton skeleton-text"></div>
+          </>
+        )}
       </div>
     </div>
   );

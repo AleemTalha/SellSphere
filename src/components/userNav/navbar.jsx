@@ -9,29 +9,28 @@ const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      const response = await fetch(`http://localhost:3000/logout`, {
-        method: "GET",
-        credentials: "include",
-      });
-  
-      const result = await response.json();
-  
-      if (response.ok) {
-        setUser(null);
-        toast.success("User has logged out successfully", { autoClose: 5000 });
-        // navigate("/login");
-      } else {
-        toast.error(result.message || "Logout failed", { autoClose: 5000 });
-      }
-    } catch (error) {
-      toast.error("Logout failed: " + error.message, { autoClose: 5000 });
-    } finally {
-      setIsLoggingOut(false);
+  setIsLoggingOut(true);
+  try {
+    const response = await fetch(`http://localhost:3000/logout`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      setUser(null);
+      toast.success("User has logged out successfully", { autoClose: 5000 });
+    } else {
+      toast.error(result.message || "Logout failed", { autoClose: 5000 });
     }
-  };
-  
+  } catch (error) {
+    toast.error("Logout failed: " + error.message, { autoClose: 5000 });
+  } finally {
+    setIsLoggingOut(false);
+  }
+};
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
@@ -40,7 +39,7 @@ const Navbar = ({ user, setUser }) => {
       </NavLink>
       <div className="nav-links">
         {user ? (
-          <div className="user-menu">
+          <div className="user-menu ">
             <div className="user-info">
               <img
                 src={user.profileImage?.url || "/images/default.png"}

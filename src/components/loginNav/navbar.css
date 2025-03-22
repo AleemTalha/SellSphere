@@ -3,8 +3,8 @@
 }
 
 .logo-2 {
-  width: 120px;
-  aspect-ratio: 7/3;
+  width: 150px;
+  aspect-ratio: 9/4;
 }
 
 .nav-link {
@@ -51,7 +51,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  background-color: rgba(255, 204, 0, 0.1); /* Updated color */
+  background-color: rgba(255, 204, 0, 0.1); 
   transform: scale(0);
   transition: transform 0.3s ease;
   z-index: -1;
