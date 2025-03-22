@@ -11,16 +11,24 @@ const Login = lazy(() => import("./pages/user/login"));
 const Dashboard = lazy(() => import("./pages/user/dashboard/dashboard"));
 const ErrorPage = lazy(() => import("./pages/error/ErrorPage"));
 import Loading from "./components/loading";
-const ForgotEmail = lazy(()=> import("./pages/user/forgotPassword/forgot"))
+const ForgotEmail = lazy(() => import("./pages/user/forgotPassword/forgot"));
+const Policy = lazy(() => import("./pages/user/policy/Policy"));
+const Contact = lazy(() => import("./pages/user/contact/Contact"));
+const FAQs = lazy(() => import("./pages/user/FAQs/faq"));
+const Profile = lazy(() => import("./pages/user/profile/Profile"));
 
 function App() {
   return (
     <Router>
-      <Suspense fallback={ <Loading />}>
+      <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/forgot-password" element={<ForgotEmail />} />
+          <Route path="/policy" element={<Policy />} />
+          <Route path="/faqs" element={<FAQs />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/profile/:id" element={<Profile />} />
           <Route path="*" element={<ErrorPage />} />{" "}
         </Routes>
       </Suspense>

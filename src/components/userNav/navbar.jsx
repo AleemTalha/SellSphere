@@ -1,27 +1,37 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./navbar.css";
 
 const Navbar = ({ user, setUser }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      const response = await fetch("http://localhost:3000/logout", {
+      const response = await fetch(`http://localhost:3000/logout`, {
         method: "GET",
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Logout failed");
-      setUser(null);
-      toast.success("User has logged out successfully", { autoClose: 5000 });
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        setUser(null);
+        toast.success("User has logged out successfully", { autoClose: 5000 });
+        // navigate("/login");
+      } else {
+        toast.error(result.message || "Logout failed", { autoClose: 5000 });
+      }
     } catch (error) {
       toast.error("Logout failed: " + error.message, { autoClose: 5000 });
     } finally {
       setIsLoggingOut(false);
     }
   };
+  
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
@@ -41,14 +51,15 @@ const Navbar = ({ user, setUser }) => {
             </div>
             <div className="dropdown-content">
               <NavLink
-                to="/profile"
-                className="dropdown-link nav-link text-black"
+                to={`/profile/${user._id}`}
+                state = {{ userId: user._id }}
+                className="dropdown-link nav-link text-black text-decoration-none"
               >
                 Profile
               </NavLink>
               <button
                 onClick={handleLogout}
-                className="dropdown-link nav-link text-black"
+                className="dropdown-link nav-link text-black text-decoration-none"
                 disabled={isLoggingOut}
               >
                 {isLoggingOut ? (
@@ -72,13 +83,13 @@ const Navbar = ({ user, setUser }) => {
           <div className="auth-links d-flex">
             <NavLink
               to="/login"
-              className="btn btn-primary elong transition-all nav-link"
+              className="btn btn-primary elong transition-all nav-link text-light text-decoration-none"
             >
               Login
             </NavLink>
             <NavLink
               to="/login"
-              className="btn btn-secondary elong transition-all nav-link"
+              className="btn btn-secondary elong transition-all nav-link text-light text-decoration-none"
             >
               Signup
             </NavLink>

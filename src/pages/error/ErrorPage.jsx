@@ -15,10 +15,10 @@ const ErrorPage = () => {
           <p className="error-message">
             Oops! The page you are looking for does not exist.
           </p>
-          <button className="btn bg-nav text-light elong transition-all border border-2 px-3 py-2 fs-5 rounded-3 mx-3" onClick={() => navigate(-1)}>
+          <button className="btn  text-decoration-none text-light bg-nav text-light elong transition-all border border-2 px-3 py-2 fs-5 rounded-3 mx-3" onClick={() => navigate(-1)}>
             Go Back
           </button>
-          <NavLink to="/" className="bg-nav text-light elong transition-all border border-2 px-3 py-2 fs-5 rounded-3 mx-3 btn">
+          <NavLink to="/" className=" text-decoration-none text-light bg-nav text-light elong transition-all border border-2 px-3 py-2 fs-5 rounded-3 mx-3 btn">
             Home
           </NavLink>
         </div>
