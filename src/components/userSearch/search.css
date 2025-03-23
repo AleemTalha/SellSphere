@@ -1,0 +1,125 @@
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  min-width: 350px;
+}
+
+.search-bar-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  position: relative;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 40px 10px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.search-icons {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.mic-button,
+.search-button {
+  border: 2px solid var(--bg-nav);
+  background-color: green !important;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 2px;
+}
+.mic-button
+{
+  padding: 10px;
+  border-radius: 10%;
+}
+
+.mic-button .bi-mic-fill.listening {
+  color: red;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover {
+  background: #f0f0f0;
+}
+
+.suggestions-list li.highlighted {
+  background: #e0e0e0;
+}
+
+.category-tag {
+  color: #888;
+  font-size: 0.8em;
+}
+
+.search-button {
+  padding: 10px 20px;
+  background-color: var(--bg-nav);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.top-center-button {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .search-container {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .search-bar-wrapper {
+    width: 100% !important;
+  }
+
+  .search-input {
+    width: 100% !important;
+  }
+
+  .suggestions-list {
+    width: 100%;
+  }
+}

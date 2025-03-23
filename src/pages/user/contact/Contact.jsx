@@ -33,8 +33,6 @@ const Contact = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log("Contact form submitted:", data);
-    // API call logic here
     showToast("Message sent successfully", true);
   };
 

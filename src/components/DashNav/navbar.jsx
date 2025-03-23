@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import Categories from "../../data/categories";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Navbar = ({ user, setLocation }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showLocation, setShowLocation] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     const fetchCityAndCountry = async (latitude, longitude) => {
@@ -17,8 +19,8 @@ const Navbar = ({ user, setLocation }) => {
           `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
         );
         const data = await response.json();
-        setCity(data.city || data.locality || "Unknown location");
-        setCountry(data.countryName || "Unknown country");
+        setCity(data.city || data.locality || "");
+        setCountry(data.countryName || "");
       } catch (error) {
         console.error("Failed to fetch city and country: " + error.message);
       }
@@ -26,11 +28,14 @@ const Navbar = ({ user, setLocation }) => {
 
     const updateLocation = (latitude, longitude) => {
       setLocation({ latitude, longitude });
-      localStorage.setItem("userLocation", JSON.stringify({ latitude, longitude }));
+      localStorage.setItem(
+        "userLocation",
+        JSON.stringify({ latitude, longitude })
+      );
       fetchCityAndCountry(latitude, longitude);
     };
 
-    const getLocation = () => {
+    const getLocationFromBrowser = () => {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -39,23 +44,30 @@ const Navbar = ({ user, setLocation }) => {
           },
           (error) => {
             console.error("Error getting location: ", error);
+            if (error.code === error.PERMISSION_DENIED) {
+              toast.error("Allow location from browser settings.", { autoClose: 3000 });
+            }
+            setCity("");
+            setCountry("");
           }
         );
       } else {
         console.error("Geolocation is not supported by your browser.");
+        setCity("");
+        setCountry("");
       }
     };
 
     const storedLocation = JSON.parse(localStorage.getItem("userLocation"));
 
-    if (user?.location?.coordinates?.length > 0) {
-      const [longitude, latitude] = user.location.coordinates;
-      fetchCityAndCountry(latitude, longitude);
-    } else if (storedLocation) {
+    if (storedLocation) {
       const { latitude, longitude } = storedLocation;
       fetchCityAndCountry(latitude, longitude);
+    } else if (user?.location?.coordinates?.length > 0) {
+      const [longitude, latitude] = user.location.coordinates;
+      updateLocation(latitude, longitude);
     } else {
-      getLocation();
+      getLocationFromBrowser();
     }
 
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -63,54 +75,68 @@ const Navbar = ({ user, setLocation }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [user, setLocation]);
 
+  const retryLocation = () => {
+    setCity("");
+    setCountry("");
+    getLocationFromBrowser();
+  };
+
   return (
-    <nav className="navbar d-flex justify-content-between" style={{zIndex:1}}>
-      <div className="item-1">
-        <div className="cursor-pointer px-5" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? (
-            <>
-              <span className="text-danger fw-bold">Close Categories &nbsp;</span>
-              <i className="bi bi-x-lg"></i>
-            </>
-          ) : (
-            <>
-              <span className="text-success fw-bold">Expand Categories &nbsp;</span>
-              <i className="bi bi-chevron-down"></i>
-            </>
-          )}
-        </div>
-
-        <div className={`drop-down ${isOpen ? "show" : ""}`}>
-          <div className="category-grid row">
-            {Categories.map((categoryData, index) => (
-              <div className="category col-lg-3 col-md-4 col-6" key={index}>
-                <div className="category-title">{categoryData.category}</div>
-                <div className="category-items">
-                  {categoryData.items.map((item, idx) => (
-                    <div key={idx}>{item}</div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="location-info">
-        {isMobile ? (
-          <div className="cursor-pointer position-relative location-icon-container">
-            <i className="bi bi-geo-alt fs-4" onClick={() => setShowLocation(!showLocation)}></i>
-            {showLocation && (
-              <div className="location-text">
-                {city}, {country}
-              </div>
+    <>
+      <nav className="navbar d-flex justify-content-between" style={{ zIndex: 1 }}>
+        <div className="item-1">
+          <div className="cursor-pointer px-5" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? (
+              <>
+                <span className="text-danger fw-bold">Close Categories &nbsp;</span>
+                <i className="bi bi-x-lg"></i>
+              </>
+            ) : (
+              <>
+                <span className="text-success fw-bold">Expand Categories &nbsp;</span>
+                <i className="bi bi-chevron-down"></i>
+              </>
             )}
           </div>
-        ) : (
-          <span className="fw-bold">{city}, {country}</span>
-        )}
-      </div>
-    </nav>
+
+          <div className={`drop-down ${isOpen ? "show" : ""}`}>
+            <div className="category-grid row">
+              {Categories.map((categoryData, index) => (
+                <div className="category col-lg-3 col-md-4 col-6" key={index}>
+                  <div className="category-title">{categoryData.category}</div>
+                  <div className="category-items">
+                    {categoryData.items.map((item, idx) => (
+                      <div key={idx}>{item}</div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="location-info">
+          {isMobile ? (
+            <div className="cursor-pointer position-relative location-icon-container">
+              <i className="bi bi-geo-alt fs-4" onClick={() => setShowLocation(!showLocation)}></i>
+              {showLocation && (
+                <div className="location-popup">
+                  <div className="location-popup-content">
+                    <span className="fw-bold">{city} {country}</span>
+                    <i className="bi bi-x-lg close-icon" onClick={() => setShowLocation(false)}></i>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <span className="fw-bold">{city}{", " + country}</span>
+          )}
+          {!city && (
+            <button onClick={retryLocation} className="btn btn-danger">No Location</button>
+          )}
+        </div>
+      </nav>
+    </>
   );
 };
 

@@ -130,7 +130,7 @@ const Forgot = () => {
           <div
             className="col-lg-7 col-md-6 col-sm-4 login-section m-0 p-0 d-none d-md-block"
             style={{
-              backgroundImage: "url('/public/images/loginForm.webp')",
+              backgroundImage: "url('/images/loginForm.webp')",
               backgroundSize: "cover",
             }}
           >
