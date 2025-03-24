@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import Categories from "../../data/categories";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -11,7 +11,32 @@ const Navbar = ({ user, setLocation }) => {
   const [country, setCountry] = useState("");
   const [showLocation, setShowLocation] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
+  const menuRef = useRef(null);
+  const showToast = (success, message) => {
+    if (success) {
+      toast.success(message, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        newestOnTop: true,
+      });
+    } else {
+      toast.error(message, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        newestOnTop: true,
+      });
+    }
+  };
   useEffect(() => {
     const fetchCityAndCountry = async (latitude, longitude) => {
       try {
@@ -19,15 +44,18 @@ const Navbar = ({ user, setLocation }) => {
           `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
         );
         const data = await response.json();
+
         setCity(data.city || data.locality || "");
         setCountry(data.countryName || "");
       } catch (error) {
-        console.error("Failed to fetch city and country: " + error.message);
+        showToast("Error fetching location data", false);
       }
     };
 
     const updateLocation = (latitude, longitude) => {
-      setLocation({ latitude, longitude });
+      if (typeof setLocation === "function") {
+        setLocation({ latitude, longitude });
+      }
       localStorage.setItem(
         "userLocation",
         JSON.stringify({ latitude, longitude })
@@ -45,7 +73,10 @@ const Navbar = ({ user, setLocation }) => {
           (error) => {
             console.error("Error getting location: ", error);
             if (error.code === error.PERMISSION_DENIED) {
-              toast.error("Allow location from browser settings.", { autoClose: 3000 });
+              showToast(
+                "Permission denied. Please allow location access.",
+                false
+              );
             }
             setCity("");
             setCountry("");
@@ -53,7 +84,8 @@ const Navbar = ({ user, setLocation }) => {
         );
       } else {
         console.error("Geolocation is not supported by your browser.");
-        setCity("");
+        showToast("Geolocation is not supported by your browser.", false);
+        setCity("No location");
         setCountry("");
       }
     };
@@ -75,6 +107,19 @@ const Navbar = ({ user, setLocation }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [user, setLocation]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const retryLocation = () => {
     setCity("");
     setCountry("");
@@ -83,17 +128,27 @@ const Navbar = ({ user, setLocation }) => {
 
   return (
     <>
-      <nav className="navbar d-flex justify-content-between" style={{ zIndex: 1 }}>
-        <div className="item-1">
-          <div className="cursor-pointer px-5" onClick={() => setIsOpen(!isOpen)}>
+      <nav
+        className="navbar d-flex justify-content-between"
+        style={{ zIndex: 1 }}
+      >
+        <div className="item-1" ref={menuRef}>
+          <div
+            className="cursor-pointer px-5"
+            onClick={() => setIsOpen(!isOpen)}
+          >
             {isOpen ? (
               <>
-                <span className="text-danger fw-bold">Close Categories &nbsp;</span>
+                <span className="text-danger fw-bold">
+                  Close Categories &nbsp;
+                </span>
                 <i className="bi bi-x-lg"></i>
               </>
             ) : (
               <>
-                <span className="text-success fw-bold">Expand Categories &nbsp;</span>
+                <span className="text-success fw-bold">
+                  Expand Categories &nbsp;
+                </span>
                 <i className="bi bi-chevron-down"></i>
               </>
             )}
@@ -118,21 +173,34 @@ const Navbar = ({ user, setLocation }) => {
         <div className="location-info">
           {isMobile ? (
             <div className="cursor-pointer position-relative location-icon-container">
-              <i className="bi bi-geo-alt fs-4" onClick={() => setShowLocation(!showLocation)}></i>
+              <i
+                className="bi bi-geo-alt fs-4"
+                onClick={() => setShowLocation(!showLocation)}
+              ></i>
               {showLocation && (
                 <div className="location-popup">
                   <div className="location-popup-content">
-                    <span className="fw-bold">{city} {country}</span>
-                    <i className="bi bi-x-lg close-icon" onClick={() => setShowLocation(false)}></i>
+                    <span className="fw-bold">
+                      {city} {country}
+                    </span>
+                    <i
+                      className="bi bi-x-lg close-icon"
+                      onClick={() => setShowLocation(false)}
+                    ></i>
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <span className="fw-bold">{city}{", " + country}</span>
+            <span className="fw-bold">
+              {city}
+              {", " + country}
+            </span>
           )}
           {!city && (
-            <button onClick={retryLocation} className="btn btn-danger">No Location</button>
+            <button onClick={retryLocation} className="btn btn-danger">
+              No Location
+            </button>
           )}
         </div>
       </nav>

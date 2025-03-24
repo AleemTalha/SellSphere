@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DashboardContent from "../../../components/DashboardContent/content";
 import "./dashboard.css";
+import Footer from "../../../components/Footer/Footer";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -16,7 +17,19 @@ const Dashboard = () => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
-
+  const showToast = (message, flag) => {
+      if (flag) {
+        toast.success(message, {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      } else {
+        toast.error(message, {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      }
+    };
   useEffect(() => {
     document.title = "SellSphere - Dashboard";
   }, []);
@@ -34,7 +47,7 @@ const Dashboard = () => {
           setUser(result.user);
         }
       } catch (error) {
-        // Handle error
+        showToast("Error fetching user data", false);
       } finally {
         setLoading(false);
       }
@@ -53,12 +66,18 @@ const Dashboard = () => {
         });
         const result = await response.json();
         if (response.ok) {
+          if (result.success)
+          {
+            showToast(result.message, true);
+          } else if (!result.success) {
+            showToast(result.message, false);
+          }
           setDashboardData(result);
         } else {
-          // Handle error
+          showToast(result.message, false);
         }
       } catch (error) {
-        // Handle error
+        showToast("Error fetching dashboard data", false);
       } finally {
         setDataLoading(false);
       }
@@ -85,11 +104,16 @@ const Dashboard = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const setLocation = (location) => {
+    setCity(location.city);
+    setCountry(location.country);
+  };
+
   return (
     <div className="dashboard-container">
       <ToastContainer />
       <Navbar user={user} setUser={setUser} />
-      <DashNav user={user} location={{ city, country }} />
+      <DashNav user={user} setLocation={setLocation} />
 
       {showScrollButton && (
         <div className="scroll-circle" onClick={scrollToTop}>
@@ -130,7 +154,7 @@ const Dashboard = () => {
       <div className="data-section" style={{ minHeight: "100vh" }}>
         {dataLoading==false ? (
           <div className="spinner-container d-flex justify-content-center align-items-start pt-5">
-            <div className="pulse-loader">
+            <div className="pulse-loader mt-3">
               <div></div>
               <div></div>
               <div></div>
@@ -139,9 +163,10 @@ const Dashboard = () => {
             </div>
           </div>
         ) : (
-          <div>{JSON.stringify(dashboardData)}</div>
+          <div>data loaded</div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

@@ -78,7 +78,6 @@ const login = () => {
         }
       } catch (error) {
         setLoading(false);
-        console.error("Error checking login status:", error);
       }
     };
 
@@ -130,6 +129,11 @@ const login = () => {
       } else if (isLogin === "login") {
         navigate("/");
       }
+      showToast(responseData.message, true);
+    }
+    else if(!responseData.success)
+    {
+      showToast(responseData.message, false);
     }
   };
   const resendOTP = async () => {

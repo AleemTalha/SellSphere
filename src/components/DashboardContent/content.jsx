@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./content.css";
-import Search from "../userSearch/search"
+import Search from "../userSearch/search";
 
 const bg1 = "/images/bg-image-2.webp";
 const bg2 = "/images/bg-image.webp";
 const bg3 = "/images/loginform.webp";
 
-const Content = () => {
+const Content = (props) => {
+  const navigate = useNavigate();
   const slides = [
     {
       image: bg1,
@@ -49,12 +51,29 @@ const Content = () => {
     return () => clearInterval(interval);
   }, [currentSlide]);
 
+  const scrollMore = () => {
+    window.scrollBy({ top: 400, behavior: "smooth" });
+  };
+
+  const postAd = () => {
+    if (!props?.user) {
+      navigate("/login");
+    } else {
+      navigate("/post-Ads");
+    }
+  };
+
   return (
     <div>
       <div
         className={`dashboard-content ${fade ? "fade-out" : "fade-in"}`}
         style={{
           backgroundImage: `url(${slides[currentSlide].image})`,
+          maxHeight: "90vh",
+          minHeight: "90vh",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          overflow: "hidden",
         }}
       >
         <div className="hero-section">
@@ -63,6 +82,14 @@ const Content = () => {
               <div className="border-text text-light scale-in">
                 <h2 className="p-0 m-0">{slides[currentSlide].heading}</h2>
                 <p className="p-0 m-0">{slides[currentSlide].text}</p>
+                <div className="button-container pt-3 d-flex justify-content-center gap-4">
+                  <button className="btn btn-secondary" onClick={scrollMore}>
+                    Explore More
+                  </button>
+                  <button className="btn btn-primary cursor-pointer" onClick={postAd} style={{zIndex:2}}>
+                    Post Your Ad
+                  </button>
+                </div>
               </div>
               <div className="carousel-buttons">
                 <button onClick={prevSlide} className="prev-btn">
@@ -78,9 +105,10 @@ const Content = () => {
       </div>
       <div className="search-container p-5">
         <Search />
-        </div>
+      </div>
       <div className="content-section">
-        </div>
+        
+      </div>
     </div>
   );
 };

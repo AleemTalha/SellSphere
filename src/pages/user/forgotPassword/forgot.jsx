@@ -11,7 +11,7 @@ const Forgot = () => {
   const [isOTPComplete, setIsOTPComplete] = useState(false);
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
-
+  
   const otpRefs = useRef(new Array(6).fill(null));
 
   const handleOTPInput = (e, index) => {
@@ -19,6 +19,8 @@ const Forgot = () => {
       otpRefs.current[index + 1]?.focus();
     }
   };
+
+  
 
   const handleOTPKeyDown = (e, index) => {
     if (e.key === "Backspace" && !e.target.value && index > 0) {

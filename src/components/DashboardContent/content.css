@@ -197,3 +197,29 @@
     border-width: 2.9px;
   }
 }
+
+.btn-primary {
+  background-color: var(--bg-nav);
+  border: 2px solid white;
+  color: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: transparent;
+  border: 2px solid var(--bg-nav);
+  color: var(--bg-nav);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 2px solid var(--bg-nav);
+  color: var(--bg-nav);
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-nav);
+  border: 2px solid white;
+  color: white;
+}

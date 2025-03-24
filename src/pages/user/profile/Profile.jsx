@@ -6,6 +6,7 @@ import "./profile.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaUpload, FaCamera } from "react-icons/fa";
 import Loading from "../../../components/loading";
+import { s } from "framer-motion/client";
 
 const CardContainer = lazy(() =>
   import("../../../components/cardContainer/cardContainer")
@@ -15,6 +16,7 @@ const Profile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [imgUrl, setImgUrl] = useState(null);
+  const [isUser, setIsUser] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showUploadForm, setShowUploadForm] = useState(false);
@@ -22,7 +24,31 @@ const Profile = () => {
   const [preview, setPreview] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-
+  const showToastMessage = (success, message) => {
+    if (success) {
+      toast.success(message, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        newestOnTop: true,
+      });
+    } else {
+      toast.error(message, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        newestOnTop: true,
+      });
+    }
+  };
   const fetchUserData = async () => {
     try {
       const response = await fetch(
@@ -36,12 +62,20 @@ const Profile = () => {
         }
       );
       const result = await response.json();
+      if(result.success == false && result.loggedIn == false)
+      {
+        showToastMessage(false, result.message || "Please Login first");
+        return navigate("/login");
+      }
       if (response.ok) {
         setUser(result.user);
         setImgUrl(result.user.profileImage?.url || "/images/default.png");
         setLoading(false);
       } else {
-        toast.error(result.message || "Failed to fetch user data");
+        showToastMessage(
+          false,
+          result.message || "Failed to fetch user data"
+        );
         setLoading(false);
       }
     } catch (error) {
@@ -69,7 +103,7 @@ const Profile = () => {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
     } else {
-      toast.error("Please select a valid image file");
+      showToastMessage(false, "Please select a valid image file");
     }
   };
 
@@ -80,7 +114,7 @@ const Profile = () => {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
     } else {
-      toast.error("Please select a valid image file");
+      showToastMessage(false, "Please select a valid image file");
     }
   };
 
@@ -113,19 +147,19 @@ const Profile = () => {
       clearTimeout(timeoutId);
       const result = await response.json();
       if (response.ok) {
-        toast.success("Profile image updated successfully");
-        setImgUrl(result.profileImage); // Update the image URL state
+        showToastMessage(true, "Image uploaded successfully");
+        setImgUrl(result.profileImage);
         setImageLoading(true);
         setShowUploadForm(false);
-        navigate("/"); // Redirect to the dashboard
+        navigate("/");
       } else {
         toast.error(result.message || "Failed to upload image");
       }
     } catch (error) {
       if (error.name === "AbortError") {
-        toast.error("Upload timed out. Please try again.");
+        showToastMessage(false, "Request timed out. Please try again.");
       } else {
-        toast.error("Failed to upload image: " + error.message);
+        showToastMessage(false, "Failed to upload image: " + error.message);
       }
     } finally {
       setUploading(false);
@@ -136,7 +170,15 @@ const Profile = () => {
   return (
     <>
       <ToastContainer />
-      <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
+      {
+        !isUser ? (
+          <div className="profile-nav">
+            
+          </div>
+        ) :
+        (
+          <>
+            <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
         <NavLink to="/" className="brand">
           <img src="/images/logo2.png" alt="logo" className="logo-2" />
         </NavLink>
@@ -307,6 +349,9 @@ const Profile = () => {
           </form>
         </div>
       )}
+          </>
+        )
+      }
     </>
   );
 };
