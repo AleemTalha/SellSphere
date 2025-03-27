@@ -6,6 +6,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import ContactButton from "./components/ContactButton/ContactButton";
+import ItemPage from "./pages/ItemPage";
+import Listing from "./pages/Listing";
 
 const Login = lazy(() => import("./pages/user/login"));
 const Dashboard = lazy(() => import("./pages/user/dashboard/dashboard"));
@@ -33,7 +35,9 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile/:id" element={<Profile />} />
-          <Route path="*" element={<ErrorPage />} />{" "}
+          <Route path="/item/:category/:subcategory" element={<ItemPage />} />
+          <Route path="/listing" element={<Listing />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </Suspense>
       <ContactButton />

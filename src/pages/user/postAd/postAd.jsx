@@ -5,6 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import categoriesData from "../../../data/categories";
 
 const PostAd = () => {
+  const [userLogin, setUserLogin] = useState(false);
   const [setted, setSetted] = useState(false);
   const { register, handleSubmit, setValue, watch, reset } = useForm();
   const [categories, setCategories] = useState([]);
@@ -13,13 +14,47 @@ const PostAd = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const selectedCategory = watch("category");
   const selectedSubCategory = watch("subCategory");
   const navigate = useNavigate();
 
   useEffect(() => {
     setCategories(categoriesData);
+  }, []);
+
+  const showToast = (message, flag) => {
+    const options = {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      newestOnTop: true,
+    };
+  
+    flag ? toast.success(message, options) : toast.error(message, options);
+  };
+  
+
+  useEffect(() => {
+    const function1 = async () => {
+      const API_URI = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URI}/post`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (result.success) {
+        setUserLogin(true);
+      } else if (!result.success && !result.loggedIn) {
+        navigate("/login");
+        setUserLogin(false);
+      }
+    };
+    function1();
   }, []);
 
   useEffect(() => {
@@ -32,7 +67,6 @@ const PostAd = () => {
       setSubCategories([]);
     }
   }, [selectedCategory, categories]);
-
   const submitCategoryData = async (data) => {
     try {
       const API_URI = import.meta.env.VITE_API_URL;
@@ -44,19 +78,14 @@ const PostAd = () => {
           "Content-Type": "application/json",
         },
       });
-
       const result = await response.json();
-
       if (result.success) {
-        toast.success(result.message || "Category submitted successfully!", {
-          autoClose: 3000,
-        });
+        showToast(result.message || "Category submitted successfully!", true);
         setSetted(true);
         setIsSubmitted(true);
       } else {
-        toast.error(result.message || "Category submission failed", {
-          autoClose: 3000,
-        });
+        showToast(result.message || "Category submission failed", false);
+        setSetted(false);
       }
     } catch (error) {
       toast.error("Error: " + error.message, { autoClose: 3000 });
@@ -86,14 +115,12 @@ const PostAd = () => {
       const result = await response.json();
 
       if (result.success) {
-        toast.success(result.message || "Ad posted successfully!", {
-          autoClose: 3000,
-        });
-        reset();
-        navigate("/");
-        setImagePreview(null);
+        showToast(result.message || "Ad posted successfully!", true);
+        // reset();
+        // navigate("/");
+        // setImagePreview(null);
       } else {
-        toast.error(result.message || "Ad posting failed", { autoClose: 3000 });
+        showToast(result.message || "Ad posting failed", false);
       }
     } catch (error) {
       toast.error("Error: " + error.message, { autoClose: 3000 });
@@ -128,221 +155,328 @@ const PostAd = () => {
         draggable
         theme="light"
       />
-      <nav className="navbar bg-nav px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 d-flex justify-content-between">
-        <NavLink to="/" className="">
-          <img src="/images/logo2.png" className="logo-2" />
-        </NavLink>
-        <button
-          onClick={() => navigate(-1)}
-          className="btn btn-outline-light d-flex align-items-center"
-        >
-          <i className="bi bi-arrow-left me-1"></i> Back
-        </button>
-      </nav>
-      <div className="container mt-4">
-        <form
-          onSubmit={handleSubmit(isSubmitted ? onSubmit : submitCategoryData)}
-        >
-          {!isSubmitted ? (
-            <div className="row">
-              <div className="col-md-6">
-                <h4>Select Category</h4>
-                <div className="list-group">
-                  {categories.map((category) => (
-                    <button
-                      key={category.category}
-                      type="button"
-                      className={`list-group-item list-group-item-action ${
-                        selectedCategory === category.category
-                          ? "active bg-nav border-0 text-white"
-                          : ""
-                      }`}
-                      onClick={() => {
-                        setValue("category", category.category);
-                        setValue("subCategory", "");
+      {userLogin ? (
+        <>
+          <nav className="navbar bg-nav px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 d-flex justify-content-between">
+            <NavLink to="/" className="">
+              <img src="/images/logo2.png" className="logo-2" />
+            </NavLink>
+            <button
+              onClick={()=>{
+                if(!isSubmitted){
+                  navigate(-1);
+                } else
+                {
+                  setIsSubmitted(false);
+                setSetted(false);
+                setValue("category", "");
+                setValue("subCategory", "");
+                setValue("image", "");
+                setImagePreview(null);
+                reset();
+                }
+              }}
+              className="btn btn-outline-light d-flex align-items-center"
+            >
+              <i className="bi bi-arrow-left me-1"></i> Back
+            </button>
+          </nav>
+          <div className="container mt-4">
+            <form
+              onSubmit={handleSubmit(
+                isSubmitted ? onSubmit : submitCategoryData
+              )}
+            >
+              {!isSubmitted ? (
+                <div className="row">
+                  <div className="col-md-6">
+                    <h4>Select Category</h4>
+                    <div className="list-group">
+                      {categories.map((category) => (
+                        <button
+                          key={category.category}
+                          type="button"
+                          className={`list-group-item list-group-item-action ${
+                            selectedCategory === category.category
+                              ? "active bg-nav border-0 text-white"
+                              : ""
+                          }`}
+                          onClick={() => {
+                            setValue("category", category.category);
+                            setValue("subCategory", "");
+                          }}
+                        >
+                          {category.category}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <h4>Select Sub-Category</h4>
+                    {selectedCategory ? (
+                      <div className="list-group">
+                        {subCategories.map((subCategory) => (
+                          <button
+                            key={subCategory}
+                            type="button"
+                            className={`list-group-item list-group-item-action ${
+                              selectedSubCategory === subCategory
+                                ? "active bg-nav border-0 text-white"
+                                : ""
+                            }`}
+                            onClick={() => setValue("subCategory", subCategory)}
+                          >
+                            {subCategory}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted">
+                        Please select a category first
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="container p-4 border rounded shadow bg-white">
+                  <div className="d-flex align-items-center mb-3">
+                    <button className="btn btn-light me-2"
+                    onClick={()=>{
+                      setIsSubmitted(false);
+                      setSetted(false);
+                      setValue("category", "");
+                      setValue("subCategory", "");
+                      setValue("image", "");
+                      setImagePreview(null);
+                      reset();
+                    }}
+                    >← Back</button>
+                    <h2 className="text-center flex-grow-1">Post Your Ad</h2>
+                  </div>
+
+                  <div className="mb-3 text-center d-flex justify-content-center">
+                    <div
+                      className="border rounded d-flex align-items-center justify-content-center position-relative"
+                      style={{
+                        width: "250px",
+                        height: "250px",
+                        backgroundColor: "#f8f9fa",
+                        overflow: "hidden",
                       }}
                     >
-                      {category.category}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="col-md-6">
-                <h4>Select Sub-Category</h4>
-                {selectedCategory ? (
-                  <div className="list-group">
-                    {subCategories.map((subCategory) => (
-                      <button
-                        key={subCategory}
-                        type="button"
-                        className={`list-group-item list-group-item-action ${
-                          selectedSubCategory === subCategory
-                            ? "active bg-nav border-0 text-white"
-                            : ""
-                        }`}
-                        onClick={() => setValue("subCategory", subCategory)}
-                      >
-                        {subCategory}
-                      </button>
-                    ))}
+                      {loading ? (
+                        <div
+                          className="spinner-border text-primary"
+                          role="status"
+                        ></div>
+                      ) : imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-100 h-100"
+                          style={{ objectFit: "cover" }}
+                        />
+                      ) : (
+                        <p className="text-muted">No image selected <br /> Please upload a square image</p>
+                      )}
+                      <input
+                        type="file"
+                        name="image"
+                        className="form-control position-absolute opacity-0 w-100 h-100"
+                        style={{ cursor: "pointer" }}
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </div>
                   </div>
-                ) : (
-                  <p className="text-muted">Please select a category first</p>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="container p-4 border rounded shadow bg-white">
-              <h2 className="text-center mb-4">Post Your Ad</h2>
-              <div className="mb-3 text-center d-flex justify-content-center">
-                <div
-                  className="border rounded d-flex align-items-center justify-content-center position-relative"
-                  style={{
-                    width: "250px",
-                    height: "250px",
-                    backgroundColor: "#f8f9fa",
-                    overflow: "hidden",
-                  }}
-                >
-                  {loading ? (
-                    <div
-                      className="spinner-border text-primary"
-                      role="status"
-                    ></div>
-                  ) : imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-100 h-100"
-                      style={{ objectFit: "cover" }}
+
+                  <div className="mb-3">
+                    <label className="form-label">Title</label>
+                    <input
+                      type="text"
+                      name="title"
+                      className="form-control"
+                      placeholder="Enter Ad Title"
+                      required
+                      {...register("title")}
                     />
-                  ) : (
-                    <p className="text-muted">No image selected</p>
+                  </div>
+
+                  {selectedCategory === "Cars" && (
+                    <>
+                      <div className="d-flex gap-3">
+                        <div className="mb-3 flex-grow-1">
+                          <label className="form-label">Make</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Car Make"
+                            {...register("Make")}
+                          />
+                        </div>
+                        <div className="mb-3 flex-grow-1">
+                          <label className="form-label">Model</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Car Model"
+                            {...register("Model")}
+                          />
+                        </div>
+                      </div>
+                      <div className="d-flex gap-3">
+                        <div className="mb-3 flex-grow-1">
+                          <label className="form-label">Year</label>
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Enter Car Year"
+                            {...register("Year")}
+                          />
+                        </div>
+                        <div className="mb-3 flex-grow-1">
+                          <label className="form-label">Mileage</label>
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Enter Mileage (KM)"
+                            {...register("Mileage")}
+                          />
+                        </div>
+                      </div>
+                    </>
                   )}
-                  <input
-                    type="file"
-                    name="image"
-                    className="form-control position-absolute opacity-0 w-100 h-100"
-                    style={{ cursor: "pointer" }}
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
+
+                  {selectedCategory === "House" && (
+                    <>
+                      <div className="d-flex gap-3">
+                        <div className="mb-3 flex-grow-1">
+                          <label className="form-label">Area (sq ft)</label>
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Enter Area"
+                            {...register("Area")}
+                          />
+                        </div>
+                        <div className="mb-3 flex-grow-1">
+                          <label className="form-label">Rooms</label>
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Enter Number of Rooms"
+                            {...register("Rooms")}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="mb-3">
+                    <label className="form-label">Price</label>
+                    <input
+                      type="number"
+                      name="price"
+                      className="form-control"
+                      placeholder="Enter Price"
+                      required
+                      {...register("price")}
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Condition</label>
+                    <select
+                      name="condition"
+                      className="form-control"
+                      required
+                      {...register("condition")}
+                    >
+                      <option value="">Select Condition</option>
+                      <option value="new">New</option>
+                      <option value="used">Used</option>
+                    </select>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Phone Number</label>
+                    <input
+                      type="text"
+                      name="phoneNumber"
+                      className="form-control"
+                      placeholder="Enter Phone Number"
+                      required
+                      {...register("phoneNumber")}
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Description</label>
+                    <textarea
+                      name="description"
+                      className="form-control"
+                      placeholder="Write a short description"
+                      required
+                      {...register("description")}
+                    ></textarea>
+                  </div>
+
+                  <div className="mb-3 form-check">
+                    <input
+                      type="checkbox"
+                      name="showNumber"
+                      className="form-check-input"
+                      id="showNumber"
+                      {...register("showNumber")}
+                    />
+                    <label className="form-check-label" htmlFor="showNumber">
+                      Show Phone Number on Ad
+                    </label>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary w-100"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <span className="spinner-border spinner-border-sm me-2"></span>
+                    ) : (
+                      "Post Ad"
+                    )}
+                  </button>
                 </div>
-              </div>
-
-              {/* Title */}
-              <div className="mb-3">
-                <label className="form-label">Title</label>
-                <input
-                  type="text"
-                  name="title"
-                  className="form-control"
-                  placeholder="Enter Ad Title"
-                  required
-                  {...register("title")}
-                />
-              </div>
-
-              {/* Description */}
-              <div className="mb-3">
-                <label className="form-label">Description</label>
-                <textarea
-                  name="description"
-                  className="form-control"
-                  placeholder="Write a short description"
-                  required
-                  {...register("description")}
-                ></textarea>
-              </div>
-
-              {/* Condition */}
-              <div className="mb-3">
-                <label className="form-label">Condition</label>
-                <select
-                  name="condition"
-                  className="form-control"
-                  required
-                  {...register("condition")}
-                >
-                  <option value="">Select Condition</option>
-                  <option value="new">New</option>
-                  <option value="used">Used</option>
-                </select>
-              </div>
-
-              {/* Price */}
-              <div className="mb-3">
-                <label className="form-label">Price</label>
-                <input
-                  type="number"
-                  name="price"
-                  className="form-control"
-                  placeholder="Enter Price"
-                  required
-                  {...register("price")}
-                />
-              </div>
-
-              {/* Phone Number */}
-              <div className="mb-3">
-                <label className="form-label">Phone Number</label>
-                <input
-                  type="text"
-                  name="PhoneNumber"
-                  className="form-control"
-                  placeholder="Enter Phone Number"
-                  required
-                  {...register("PhoneNumber")}
-                />
-              </div>
-
-              {/* Show Number Checkbox */}
-              <div className="mb-3 form-check">
-                <input
-                  type="checkbox"
-                  name="showNumber"
-                  className="form-check-input"
-                  id="showNumber"
-                  {...register("showNumber")}
-                />
-                <label className="form-check-label" htmlFor="showNumber">
-                  Show Phone Number on Ad
-                </label>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="btn btn-primary w-100"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <span className="spinner-border spinner-border-sm me-2"></span>
-                ) : (
-                  "Post Ad"
-                )}
-              </button>
-            </div>
-          )}
-          {!setted && (
-            <div className="text-center mt-4">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={
-                  !selectedCategory || !selectedSubCategory || isSubmitting
-                }
-              >
-                {isSubmitting ? (
-                  <span className="spinner-border spinner-border-sm me-2"></span>
-                ) : (
-                  "Next"
-                )}
-              </button>
-            </div>
-          )}
-        </form>
-      </div>
+              )}
+              {!setted && (
+                <div className="text-center mt-4">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={
+                      !selectedCategory || !selectedSubCategory || isSubmitting
+                    }
+                  >
+                    {isSubmitting ? (
+                      <span className="spinner-border spinner-border-sm me-2"></span>
+                    ) : (
+                      "Next"
+                    )}
+                  </button>
+                </div>
+              )}
+            </form>
+          </div>
+        </>
+      ) : (
+        <>
+          <div
+            className="text-center h2 pt-5"
+            style={{ color: "var(--bg-nav)" }}
+          >
+            User not loggedd in
+          </div>
+        </>
+      )}
     </>
   );
 };

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "./navbar.css";
 
 const showToastMessage = (success, message) => {
@@ -30,10 +30,16 @@ const showToastMessage = (success, message) => {
   }
 };
 
-
 const Navbar = ({ user, setUser }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -59,20 +65,30 @@ const Navbar = ({ user, setUser }) => {
   };
 
   return (
+    <>
+    <ToastContainer/>
     <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
       <NavLink to="/" className="brand">
         <img src="/images/logo2.png" alt="logo" className="logo-2" />
       </NavLink>
       <div className="nav-links">
         {user ? (
-          <div className="user-menu ">
+          <div className="user-menu">
             <div className="user-info">
-              <img
-                src={user.profileImage?.url || "/images/default.png"}
-                alt="Profile"
-                className="user-image"
-              />
-              <span className="user-name">{user.fullName}</span>
+              {loading ? (
+                <>
+                  <div className="skeleton-image"></div>
+                </>
+              ) : (
+                <>
+                  <img
+                    src={user.profileImage?.url || "/images/default.png"}
+                    alt="Profile"
+                    className="user-image"
+                  />
+                  <span className="user-name">{user.fullName}</span>
+                </>
+              )}
             </div>
             <div className="dropdown-content">
               <NavLink
@@ -122,6 +138,7 @@ const Navbar = ({ user, setUser }) => {
         )}
       </div>
     </nav>
+    </>
   );
 };
 

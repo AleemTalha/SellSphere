@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import Categories from "../../data/categories";
+import { useNavigate, NavLink } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { use } from "framer-motion/m";
+import slugify from "slugify";
 
 const Navbar = ({ user, setLocation }) => {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
@@ -37,6 +42,7 @@ const Navbar = ({ user, setLocation }) => {
       });
     }
   };
+
   useEffect(() => {
     const fetchCityAndCountry = async (latitude, longitude) => {
       try {
@@ -71,7 +77,7 @@ const Navbar = ({ user, setLocation }) => {
             updateLocation(latitude, longitude);
           },
           (error) => {
-            console.error("Error getting location: ", error);
+            showToast(false, "Error getting location: ");
             if (error.code === error.PERMISSION_DENIED) {
               showToast(
                 "Permission denied. Please allow location access.",
@@ -121,7 +127,7 @@ const Navbar = ({ user, setLocation }) => {
   }, []);
 
   const retryLocation = () => {
-    setCity("");
+    setCity("Fetching location...");
     setCountry("");
     getLocationFromBrowser();
   };
@@ -161,7 +167,19 @@ const Navbar = ({ user, setLocation }) => {
                   <div className="category-title">{categoryData.category}</div>
                   <div className="category-items">
                     {categoryData.items.map((item, idx) => (
-                      <div key={idx}>{item}</div>
+                      <>
+                        <NavLink
+                        key={idx}
+                        to={`/item/${slugify(categoryData.category, {
+                          lower: true,
+                        })}/${slugify(item, { lower: true })}`}
+                        className="text-dark text-decoration-none"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {item}
+                      </NavLink>
+                      <br />
+                      </>
                     ))}
                   </div>
                 </div>
@@ -181,7 +199,8 @@ const Navbar = ({ user, setLocation }) => {
                 <div className="location-popup">
                   <div className="location-popup-content">
                     <span className="fw-bold">
-                      {city} {country}
+                      {city}
+                      {"," + country}
                     </span>
                     <i
                       className="bi bi-x-lg close-icon"
@@ -194,7 +213,7 @@ const Navbar = ({ user, setLocation }) => {
           ) : (
             <span className="fw-bold">
               {city}
-              {", " + country}
+              {"," + country}
             </span>
           )}
           {!city && (
@@ -204,6 +223,7 @@ const Navbar = ({ user, setLocation }) => {
           )}
         </div>
       </nav>
+      <ToastContainer />
     </>
   );
 };

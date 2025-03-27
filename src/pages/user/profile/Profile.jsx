@@ -4,13 +4,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./profile.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { FaUpload, FaCamera } from "react-icons/fa";
+import {  FaCamera } from "react-icons/fa";
 import Loading from "../../../components/loading";
-import { s } from "framer-motion/client";
-
-const CardContainer = lazy(() =>
-  import("../../../components/cardContainer/cardContainer")
-);
+import Card from "../../../components/card/card";
 
 const Profile = () => {
   const { id } = useParams();
@@ -62,8 +58,7 @@ const Profile = () => {
         }
       );
       const result = await response.json();
-      if(result.success == false && result.loggedIn == false)
-      {
+      if (result.success == false && result.loggedIn == false) {
         showToastMessage(false, result.message || "Please Login first");
         return navigate("/login");
       }
@@ -72,10 +67,7 @@ const Profile = () => {
         setImgUrl(result.user.profileImage?.url || "/images/default.png");
         setLoading(false);
       } else {
-        showToastMessage(
-          false,
-          result.message || "Failed to fetch user data"
-        );
+        showToastMessage(false, result.message || "Failed to fetch user data");
         setLoading(false);
       }
     } catch (error) {
@@ -170,188 +162,213 @@ const Profile = () => {
   return (
     <>
       <ToastContainer />
-      {
-        !isUser ? (
-          <div className="profile-nav">
-            
-          </div>
-        ) :
-        (
-          <>
-            <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
-        <NavLink to="/" className="brand">
-          <img src="/images/logo2.png" alt="logo" className="logo-2" />
-        </NavLink>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse text-center " id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <NavLink to="/" className="nav-link bg-nav text-light me-2 text-decoration-none">
-                Home
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/edit-profile"
-                className="nav-link bg-nav text-light text-decoration-none"
-              >
-                Edit Profile
-              </NavLink>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
-      <div className="profile-container d-flex justify-content-center align-items-center">
-        <div className="profile-content w-100">
-          <div className="row align-items-center">
-            <div className="col-md-4 text-center">
-              <div className="profile-image-container">
-                {imageLoading ? (
-                  <div className="skeleton skeleton-image"></div>
-                ) : (
-                  <img
-                    src={imgUrl}
-                    alt="Profile"
-                    className="profile-image fade-in"
-                    onLoad={handleImageLoad}
-                    onClick={handleImageClick}
-                  />
-                )}
-                <div
-                  style={{
-                    backgroundColor: "#3f7d58cc",
-                  }}
-                  className="upload-icon-overlay text-light w-100 h-100 rounded-circle d-flex justify-content-center align-items-center"
-                >
-                  <FaCamera onClick={handleImageClick} className="fs-3" />
-                </div>
-              </div>
-            </div>
-            <div className="col-md-8">
-              <div className="profile-info">
-                <h1 className="profile-name">
-                  {loading ? (
-                    <div className="skeleton skeleton-text"></div>
-                  ) : (
-                    <span className="fade-in">
-                      {user?.fullname || "Unknown User"}
-                    </span>
-                  )}
-                </h1>
-                <div className="profile-details">
-                  {loading ? (
-                    <>
-                      <div className="profile-field">
-                        <div className="skeleton skeleton-full"></div>
-                      </div>
-                      <div className="profile-field">
-                        <div className="skeleton skeleton-full"></div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="profile-field">
-                        <label className="profile-label">Email:</label>
-                        <span className="profile-value fade-in">
-                          {user?.email || "N/A"}
-                        </span>
-                      </div>
-                      <div className="profile-field">
-                        <label className="profile-label">Phone Number:</label>
-                        <span className="profile-value fade-in">
-                          {user?.phoneNo || "Not Provided"}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                  {/* Add more fields as needed */}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-100 mt-4">
-        {user?.posts && user.posts.length > 0 ? (
-          <Suspense fallback={<Loading />}>
-            <CardContainer cards={user.posts} />
-          </Suspense>
-        ) : (
-          <div className="no-ads-message text-center mt-5">
-            <h2>You haven't posted any ads yet.</h2>
-            <p>Start posting ads to see them here.</p>
-          </div>
-        )}
-      </div>
-
-      {showUploadForm && (
-        <div className="upload-form-container">
-          <form onSubmit={handleUpload} className="upload-form">
-            <div
-              className="drop-area"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById("fileInput").click()}
+      {isUser ? (
+        <div className="profile-nav">this will be empty</div>
+      ) : (
+        <>
+          <nav className="navbar navbar-expand-lg navbar-dark bg-nav sticky-top px-xl-5 px-lg-4 px-md-3 px-sm-2 px-1 py-1 py-lg-2">
+            <NavLink to="/" className="brand">
+              <img src="/images/logo2.png" alt="logo" className="logo-2" />
+            </NavLink>
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNav"
+              aria-controls="navbarNav"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
             >
-              <p>Drag & Drop or Click to Upload</p>
-              {preview ? (
-                <img src={preview} alt="Preview" className="preview-image" />
-              ) : (
-                <p>📁 Choose an image</p>
-              )}
-              <input
-                type="file"
-                id="fileInput"
-                accept="image/*"
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-              />
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <div
+              className="collapse navbar-collapse text-center "
+              id="navbarNav"
+            >
+              <ul className="navbar-nav ms-auto">
+                <li className="nav-item">
+                  <NavLink
+                    to="/"
+                    className="nav-link bg-nav text-light me-2 text-decoration-none"
+                  >
+                    Home
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/edit-profile"
+                    className="nav-link bg-nav text-light text-decoration-none"
+                  >
+                    Edit Profile
+                  </NavLink>
+                </li>
+              </ul>
             </div>
-            <div className="upload-icons">
-              <button
-                type="submit"
-                disabled={uploading}
-                className="btn btn-primary"
-              >
-                {uploading ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    Uploading...
-                  </>
-                ) : (
-                  "Upload"
-                )}
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowUploadForm(false)}
-              >
-                Cancel
-              </button>
+          </nav>
+
+          <div className="profile-container d-flex justify-content-center align-items-center">
+            <div className="profile-content w-100">
+              <div className="row align-items-center">
+                <div className="col-md-4 text-center">
+                  <div className="profile-image-container">
+                    {imageLoading ? (
+                      <div className="skeleton skeleton-image"></div>
+                    ) : (
+                      <img
+                        src={imgUrl}
+                        alt="Profile"
+                        className="profile-image fade-in"
+                        onLoad={handleImageLoad}
+                        onClick={handleImageClick}
+                      />
+                    )}
+                    <div
+                      style={{
+                        backgroundColor: "#3f7d58cc",
+                      }}
+                      className="upload-icon-overlay text-light w-100 h-100 rounded-circle d-flex justify-content-center align-items-center"
+                    >
+                      <FaCamera onClick={handleImageClick} className="fs-3" />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-8">
+                  <div className="profile-info">
+                    <h1 className="profile-name">
+                      {loading ? (
+                        <div className="skeleton skeleton-text"></div>
+                      ) : (
+                        <span className="fade-in">
+                          {user?.fullname || "Unknown User"}
+                        </span>
+                      )}
+                    </h1>
+                    <div className="profile-details">
+                      {loading ? (
+                        <>
+                          <div className="profile-field">
+                            <div className="skeleton skeleton-full"></div>
+                          </div>
+                          <div className="profile-field">
+                            <div className="skeleton skeleton-full"></div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="profile-field">
+                            <label className="profile-label">Email:</label>
+                            <span className="profile-value fade-in">
+                              {user?.email || "N/A"}
+                            </span>
+                          </div>
+                          <div className="profile-field">
+                            <label className="profile-label">
+                              Phone Number:
+                            </label>
+                            <span className="profile-value fade-in">
+                              {user?.phoneNo || "Not Provided"}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                      {/* Add more fields as needed */} 
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </form>
-        </div>
+          </div>
+
+          <div className="d-flex justify-content-center">
+            {user?.posts && user.posts.length > 0 ? (
+              <div className="">
+                {" "}
+                {user.posts.map((post) => (
+                  <div
+                    className="col-lg-3 col-md-4 col-6"
+                    key={post._id}
+                  >
+                    {/* <Card
+                      image={post.image.url}
+                      title={post.title}
+                      price={post.price}
+                      description={post.description}
+                    /> */}
+                    {
+                      post
+                    }
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center mt-5">
+                <h2>You haven't posted any ads yet.</h2>
+                <p>Start posting ads to see them here.</p>
+              </div>
+            )}
+          </div>
+
+          {showUploadForm && (
+            <div className="upload-form-container">
+              <form onSubmit={handleUpload} className="upload-form">
+                <div
+                  className="drop-area"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById("fileInput").click()}
+                >
+                  <p>Drag & Drop or Click to Upload</p>
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="preview-image"
+                    />
+                  ) : (
+                    <p>Choose an image</p>
+                  )}
+                  <input
+                    type="file"
+                    id="fileInput"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                </div>
+                <div className="upload-icons d-flex justify-content-between mt-3 gap-5">
+                  <button
+                    type="submit"
+                    disabled={uploading}
+                    className="border bg-nav w-50"
+                  >
+                    {uploading ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        >
+                        </span>
+                          Uploading ... 
+                        
+                      </>
+                    ) : (
+                      "Upload"
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-nav w-50"
+                    onClick={() => setShowUploadForm(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </>
       )}
-          </>
-        )
-      }
     </>
   );
 };
