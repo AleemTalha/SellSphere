@@ -11,8 +11,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import ContactButton from "./components/ContactButton/ContactButton";
-import ItemPage from "./pages/ItemPage";
-import Listing from "./pages/Listing";
 
 const Login = lazy(() => import("./pages/user/login"));
 // const Dashboard = lazy(() => import("./pages/user/dashboard/dashboard"));
@@ -26,7 +24,10 @@ const Contact = lazy(() => import("./pages/user/contact/Contact"));
 const FAQs = lazy(() => import("./pages/user/FAQs/faq"));
 const Profile = lazy(() => import("./pages/user/profile/Profile"));
 const About = lazy(() => import("./pages/About/About"));
-const ItemDetails = lazy(() => import("./pages/ItemDetails"));
+const ItemDetails = lazy(() => import("./pages/user/itemsDetail/ItemDetails"));
+const CategoriesSearching = lazy(() =>
+  import("./pages/user/CategoriesSearchingPage")
+);
 
 function TimeoutFallback() {
   const [timeoutReached, setTimeoutReached] = useState(false);
@@ -62,7 +63,7 @@ function TimeoutFallback() {
 function App() {
   return (
     <Router>
-      <Suspense fallback={<TimeoutFallback />}>
+      <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
@@ -73,8 +74,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile/:id" element={<Profile />} />
-          <Route path="/item/:category/:subcategory" element={<ItemPage />} />
-          <Route path="/listing" element={<Listing />} />
+          <Route path="/category/:category/:subcategory?" element={<CategoriesSearching />} />
           <Route path="/item-id/:id/:category/" element={<ItemDetails />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>

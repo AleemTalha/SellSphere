@@ -135,7 +135,7 @@ const Navbar = ({ user, setLocation }) => {
   return (
     <>
       <nav
-        className="navbar d-flex justify-content-between"
+        className="navbar bg-light d-flex justify-content-between"
         style={{ zIndex: 1 }}
       >
         <div className="item-1" ref={menuRef}>
@@ -144,24 +144,24 @@ const Navbar = ({ user, setLocation }) => {
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? (
-              <>
+              <div className="transition-all">
                 <span className="text-danger fw-bold">
                   Close Categories &nbsp;
                 </span>
-                <i className="bi bi-x-lg"></i>
-              </>
+                <i className="bi bi-x-lg text-danger"></i>
+              </div>
             ) : (
               <>
                 <span className="text-success fw-bold">
                   Expand Categories &nbsp;
                 </span>
-                <i className="bi bi-chevron-down"></i>
+                <i className="bi bi-chevron-down text-dark"></i>
               </>
             )}
           </div>
 
           <div className={`drop-down ${isOpen ? "show" : ""}`}>
-            <div className="category-grid row">
+            <div className="category-grid row text-start">
               {Categories.map((categoryData, i) => (
                 <div className="category col-lg-3 col-md-4 col-6" key={i}>
                   <div className="category-title">{categoryData.category}</div>
@@ -170,9 +170,7 @@ const Navbar = ({ user, setLocation }) => {
                       <>
                         <NavLink
                           key={idx}
-                          to={`/item/${slugify(categoryData.category, {
-                            lower: true,
-                          })}/${slugify(item, { lower: true })}`}
+                          to={`/category/${slugify(categoryData.category)}/${slugify(item)}`}
                           className="text-dark text-decoration-none"
                           onClick={() => setIsOpen(false)}
                         >
@@ -198,12 +196,12 @@ const Navbar = ({ user, setLocation }) => {
               {showLocation && (
                 <div className="location-popup">
                   <div className="location-popup-content">
-                    <span className="fw-bold">
+                    <span className="fw-bold text-nav">
                       {city}
                       {"," + country}
                     </span>
                     <i
-                      className="bi bi-x-lg close-icon"
+                      className="bi bi-x-lg close-icon "
                       onClick={() => setShowLocation(false)}
                     ></i>
                   </div>
@@ -211,7 +209,7 @@ const Navbar = ({ user, setLocation }) => {
               )}
             </div>
           ) : (
-            <span className="fw-bold">
+            <span className="fw-bold text-dark">
               {city}
               {city ? ", " : ""}
               {country}

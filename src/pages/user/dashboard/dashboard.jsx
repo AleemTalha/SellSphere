@@ -10,6 +10,7 @@ import DashboardContent from "../../../components/DashboardContent/content";
 import "./dashboard.css";
 import Card from "../../../components/dashCards/card";
 import Footer from "../../../components/Footer/Footer";
+import CategoriesShow from "../../../components/CategoriesShow/CategoriesShow";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);

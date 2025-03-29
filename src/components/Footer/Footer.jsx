@@ -13,9 +13,9 @@ const Footer = () => {
           </div>
           <div className="col-md-4 d-none d-lg-flex mb-3 mb-md-0 flex-column align-items-center align-items-md-start">
             <h5>Contact Us</h5>
-            <p className="mb-1">Email: info@yourcompany.com</p>
-            <p className="mb-1">Phone: +1 (123) 456-7890</p>
-            <p className="mb-0">Address: 123 Business Street, City, Country</p>
+            <p className="mb-1">Email: aleemtalha098@gmail.com</p>
+            <p className="mb-1">Phone: +92 (327) 0445135</p>
+            <p className="mb-0">Address: Shokat Town, Lahore, Pakistan</p>
           </div>
           <div className="col-md-4 d-flex flex-column align-items-center align-items-md-start">
             <h5>Quick Links</h5>

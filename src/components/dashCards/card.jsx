@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./card.css";
 import { NavLink } from "react-router-dom";
-import slugify from "slugify"; // Import slugify
+import slugify from "slugify";
 
 const Card = ({ ad }) => {
   const [locationInfo, setLocationInfo] = useState({
@@ -10,8 +10,8 @@ const Card = ({ ad }) => {
   });
   const [timeAgo, setTimeAgo] = useState("");
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [isImageVisible, setIsImageVisible] = useState(false); // Track visibility
-  const imageRef = useRef(null); // Ref for the image element
+  const [isImageVisible, setIsImageVisible] = useState(false);
+  const imageRef = useRef(null);
 
   useEffect(() => {
     const fetchLocationInfo = async () => {
@@ -57,7 +57,7 @@ const Card = ({ ad }) => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsImageVisible(true); // Set visibility to true when in view
+          setIsImageVisible(true);
         }
       },
       { threshold: 0.1 }
@@ -78,7 +78,7 @@ const Card = ({ ad }) => {
     <div className="d-card">
       <div className="d-card-image-wrapper" ref={imageRef}>
         {!isImageLoaded && <div className="skeleton skeleton-image"></div>}
-        {isImageVisible && ( // Load image only when visible
+        {isImageVisible && (
           <img
             src={ad.image.url}
             alt={ad.title}

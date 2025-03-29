@@ -5,9 +5,11 @@ const Card = ({ image, title, price, description, postId, onCardHidden }) => {
   const [showMore, setShowMore] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [deleting, setDeleting] = useState(false); 
+  const [deleting, setDeleting] = useState(false);
   const [hidden, setHidden] = useState(false);
   const menuRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const [descriptionHeight, setDescriptionHeight] = useState("100px");
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -37,7 +39,7 @@ const Card = ({ image, title, price, description, postId, onCardHidden }) => {
       );
       const result = await response.json();
       if (response.ok) {
-        setHidden(true); 
+        setHidden(true);
         onCardHidden(postId);
       } else {
         alert(result.message || "Failed to delete the post.");
@@ -45,12 +47,22 @@ const Card = ({ image, title, price, description, postId, onCardHidden }) => {
     } catch (error) {
       alert("Failed to delete the post: " + error.message);
     } finally {
-      setDeleting(false); 
+      setDeleting(false);
     }
   };
 
+  const toggleShowMore = () => {
+    if (showMore) {
+      setDescriptionHeight("100px");
+    } else {
+      const fullHeight = descriptionRef.current.scrollHeight;
+      setDescriptionHeight(`${fullHeight}px`);
+    }
+    setShowMore(!showMore);
+  };
+
   if (hidden) {
-    return null; 
+    return null;
   }
 
   return (
@@ -64,7 +76,10 @@ const Card = ({ image, title, price, description, postId, onCardHidden }) => {
           )}
         </div>
         <div className="post-menu" ref={menuRef}>
-          <button className="menu-btn text-light" onClick={() => setMenuOpen(!menuOpen)}>
+          <button
+            className="menu-btn text-light"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
             ⋮
           </button>
           {menuOpen && (
@@ -91,24 +106,30 @@ const Card = ({ image, title, price, description, postId, onCardHidden }) => {
       </div>
 
       <div className="post-description">
-  {imageLoaded ? (
-    <>
-      <span
-        dangerouslySetInnerHTML={{
-          __html: (showMore ? description : description.slice(0, 100)).replace(/\n/g, "<br/>"),
-        }}
-      />
-      {description.length > 100 && (
-        <span className="see-more" onClick={() => setShowMore(!showMore)}>
-          {showMore ? " See Less" : " ...See More"}
-        </span>
-      )}
-    </>
-  ) : (
-    <div className="skeleton-text skeleton-description"></div>
-  )}
-</div>
-
+        {imageLoaded ? (
+          <>
+            <div
+              ref={descriptionRef}
+              className="description-content"
+              style={{
+                height: descriptionHeight,
+                overflow: "hidden",
+                transition: "height 0.5s ease",
+              }}
+              dangerouslySetInnerHTML={{
+                __html: description.replace(/\n/g, "<br/>"),
+              }}
+            />
+            {description.length > 100 && (
+              <span className="see-more" onClick={toggleShowMore}>
+                {showMore ? " See Less" : " ...See More"}
+              </span>
+            )}
+          </>
+        ) : (
+          <div className="skeleton-text skeleton-description"></div>
+        )}
+      </div>
 
       <div className="post-image-container">
         {deleting ? (

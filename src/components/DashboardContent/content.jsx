@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./content.css";
 import Search from "../userSearch/search";
+import CategoriesShow from "../CategoriesShow/CategoriesShow";
 
 const bg1 = "/images/bg-image-2.webp";
 const bg2 = "/images/bg-image.webp";
@@ -83,12 +84,17 @@ const Content = (props) => {
                 <h2 className="p-0 m-0">{slides[currentSlide].heading}</h2>
                 <p className="p-0 m-0">{slides[currentSlide].text}</p>
                 <div className="button-container pt-3 d-flex justify-content-center gap-2 gap-sm-4">
-                  <button className="btn px-1 py-1 bg-transparent text-light border"
-                   onClick={scrollMore}
-                   >
+                  <button
+                    className="btn px-1 py-1 bg-transparent text-light border"
+                    onClick={scrollMore}
+                  >
                     Explore More
                   </button>
-                  <button className="btn bg-nav text-light  cursor-pointer" onClick={postAd} style={{zIndex:2}}>
+                  <button
+                    className="btn bg-nav text-light  cursor-pointer"
+                    onClick={postAd}
+                    style={{ zIndex: 2 }}
+                  >
                     Post Your Ad
                   </button>
                 </div>
@@ -108,8 +114,8 @@ const Content = (props) => {
       <div className="search-container p-5">
         <Search />
       </div>
-      <div className="content-section">
-        
+      <div className="categories-container">
+        <CategoriesShow />
       </div>
     </div>
   );

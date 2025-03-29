@@ -1,51 +1,99 @@
 .search-container {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto;
   min-width: 350px;
+  padding: 10px;
 }
 
 .search-bar-wrapper {
   display: flex;
-  gap: 10px;
   align-items: center;
   position: relative;
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
 }
 
 .search-input {
   flex: 1;
-  padding: 10px 40px 10px 10px;
-  border: 1px solid #ccc;
+  padding: 6px;
+  border: none;
+  outline: none;
+  font-size: 14px;
   border-radius: 4px;
-  font-size: 16px;
-  width: 100%;
+  width: calc(100% - 100px);
 }
 
 .search-icons {
-  position: absolute;
-  right: 10px;
   display: flex;
   align-items: center;
+  gap: 8px;
+  position: relative;
 }
 
-.mic-button,
-.search-button {
-  border: 2px solid var(--bg-nav);
-  background-color: green !important;
-  background: none;
+.mic-button {
+  background-color: #e9ecef;
   border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  margin-left: 2px;
-}
-.mic-button
-{
-  padding: 10px;
-  border-radius: 10%;
+  position: relative;
+  transition: background-color 0.3s ease;
 }
 
-.mic-button .bi-mic-fill.listening {
-  color: red;
+.mic-button.listening {
+  background-color: #ff6b6b;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 107, 107, 1);
+  }
+}
+
+.mic-button i {
+  font-size: 20px;
+  color: #495057;
+}
+
+.mic-button.listening i {
+  color: #fff;
+}
+
+.search-button {
+  background-color: #007bff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #0056b3;
+}
+
+.search-button i {
+  font-size: 20px;
+  color: #fff;
 }
 
 .suggestions-list {
@@ -53,47 +101,33 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-top: none;
+  margin-top: 8px;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
   list-style: none;
   padding: 0;
-  margin: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .suggestions-list li {
-  padding: 10px;
+  padding: 8px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.suggestions-list li:hover {
-  background: #f0f0f0;
-}
-
+.suggestions-list li:hover,
 .suggestions-list li.highlighted {
-  background: #e0e0e0;
+  background-color: #007bff;
+  color: #fff;
 }
 
 .category-tag {
-  color: #888;
-  font-size: 0.8em;
-}
-
-.search-button {
-  padding: 10px 20px;
-  background-color: var(--bg-nav);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.search-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  font-size: 12px;
+  color: #6c757d;
 }
 
 .top-center-button {
@@ -108,15 +142,21 @@
 @media (max-width: 768px) {
   .search-container {
     min-width: 100% !important;
-    width: 100% !important;
+    width: 90%;
   }
 
   .search-bar-wrapper {
-    width: 100% !important;
+    flex-direction: row;
+    gap: 5px;
+    width: 100%;
   }
 
   .search-input {
-    width: 100% !important;
+    width: calc(100% - 100px);
+  }
+
+  .search-icons {
+    justify-content: flex-end;
   }
 
   .suggestions-list {

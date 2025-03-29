@@ -4,10 +4,10 @@ import "./loading.css";
 const Loading = () => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    document.body.style.pointerEvents = "none"; // Disable all pointer events
+    document.body.style.pointerEvents = "none"; 
     return () => {
       document.body.style.overflow = "auto";
-      document.body.style.pointerEvents = "auto"; // Re-enable pointer events
+      document.body.style.pointerEvents = "auto";
     };
   }, []);
 
@@ -18,9 +18,9 @@ const Loading = () => {
       </div>
       <h2 className="loading-text">
         Loading
-        <span className="dot">.</span>
-        <span className="dot">.</span>
-        <span className="dot">.</span>
+        <span className="dot-l">.</span>
+        <span className="dot-l">.</span>
+        <span className="dot-l">.</span>
       </h2>
     </div>
   );

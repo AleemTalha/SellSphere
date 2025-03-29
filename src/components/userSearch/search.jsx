@@ -107,6 +107,11 @@ const SearchBar = () => {
   }, [highlightedIndex]);
 
   const startListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
     if (!recognitionRef.current) {
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -145,7 +150,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="search-container" style={{ }}>
+    <div className="search-container">
       <div className="search-bar-wrapper">
         <input
           type="text"
@@ -158,12 +163,11 @@ const SearchBar = () => {
           className="search-input"
         />
         <div className="search-icons">
-          <button onClick={startListening} className="mic-button">
-            <i
-              className={`bi ${
-                isListening ? "bi-mic-fill listening" : "bi-mic"
-              }`}
-            ></i>
+          <button
+            onClick={startListening}
+            className={`mic-button ${isListening ? "listening" : ""}`}
+          >
+            <i className={`bi ${isListening ? "bi-mic-fill" : "bi-mic"}`}></i>
           </button>
           <button onClick={handleSearchClick} className="search-button">
             <i className="bi bi-search"></i>
