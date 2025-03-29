@@ -1,30 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import TopMenu from "../../components/categorieCard/topMenu";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoginNav from "../../components/loginNav/navbar";
 import Card from "../../components/categorieCard/card";
+import categoriesData from "../../data/categories";
 import "./CategoriesSearchingPage.css";
 
 const CategoriesSearchingPage = () => {
   let { category, subcategory } = useParams();
+
   const [formattedCategory, setFormattedCategory] = useState("");
   const [formattedSubcategory, setFormattedSubcategory] = useState("");
   const [data, setData] = useState([]);
   const [filters, setFilters] = useState({
     startPrice: "",
     lastPrice: "",
-    subcategory: "",
+    subcategory: subcategory ? unslugify(subcategory) : "",
   });
+  const [tempFilters, setTempFilters] = useState({
+    startPrice: "",
+    lastPrice: "",
+  });
+  const [subcategories, setSubcategories] = useState([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(
+    subcategory ? unslugify(subcategory) : ""
+  );
   const [loading, setLoading] = useState(false);
   const [firstId, setFirstId] = useState(null);
   const [lastId, setLastId] = useState(null);
   const [noMoreAds, setNoMoreAds] = useState(false);
   const navigate = useNavigate();
 
-  // Toast notification function
   const showToast = (message, isSuccess) => {
     toast(message, {
       type: isSuccess ? "success" : "error",
@@ -39,7 +47,6 @@ const CategoriesSearchingPage = () => {
     });
   };
 
-  // Function to unslugify the category and subcategory
   function unslugify(str) {
     return str
       .replace(/-/g, " ")
@@ -47,28 +54,36 @@ const CategoriesSearchingPage = () => {
   }
 
   useEffect(() => {
-    const formattedCat = unslugify(category);
-    setFormattedCategory(formattedCat);
-
+    setFormattedCategory(unslugify(category));
     if (subcategory) {
-      const formattedSub = unslugify(subcategory);
-      setFormattedSubcategory(formattedSub);
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        subcategory: formattedSub,
-      }));
-    } else {
-      setFormattedSubcategory("");
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        subcategory: "",
-      }));
+      setFormattedSubcategory(unslugify(subcategory));
     }
   }, [category, subcategory]);
 
-  // Fetch data from backend based on the filter and append if necessary
+  useEffect(() => {
+    if (category) {
+      const categoryData = categoriesData.find(
+        (cat) => cat.category.toLowerCase() === category.toLowerCase()
+      );
+      setSubcategories(categoryData ? categoryData.items : []);
+      if (subcategory) {
+        setSelectedSubcategory(unslugify(subcategory));
+      } else {
+        setSelectedSubcategory("");
+      }
+    } else {
+      setSubcategories([]);
+    }
+  }, [category, subcategory]);
+
   const fetchData = async (queryFilters, append = false) => {
     setLoading(true);
+    if (!append) {
+      setData([]);
+      setFirstId(null);
+      setLastId(null);
+      setNoMoreAds(false);
+    }
     const API_URI = import.meta.env.VITE_API_URI || "http://localhost:3000";
     const queryParams = new URLSearchParams({
       categorie: unslugify(category),
@@ -100,7 +115,6 @@ const CategoriesSearchingPage = () => {
         navigate("/login", { replace: true });
         return;
       }
-
       const result = await response.json();
       if (result.success) {
         if (result.ads.length === 0) {
@@ -127,35 +141,82 @@ const CategoriesSearchingPage = () => {
 
   useEffect(() => {
     fetchData(filters);
-  }, [filters]);
+  }, [filters, category, subcategory]);
 
-  // Handle changes in filters (price range or subcategory)
   const handleFilterChange = (newFilters) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
+    const updatedFilters = {
+      ...filters,
       ...newFilters,
-    }));
-    setData([]); // Clear the current data when filters are changed
-    setFirstId(null); // Reset firstId when filters change
-    setLastId(null); // Reset lastId when filters change
-    setNoMoreAds(false); // Reset the noMoreAds flag
+    };
+    fetchData(updatedFilters);
   };
 
-  // Handle Load More button click
   const handleLoadMore = () => {
     if (!noMoreAds) {
       fetchData(filters, true);
     }
   };
 
+  const applyFilters = () => {
+    setFilters({
+      ...tempFilters,
+      subcategory: selectedSubcategory,
+    });
+    setFirstId(null);
+    setLastId(null);
+  };
+
   return (
     <div>
       <ToastContainer />
       <LoginNav />
-      <TopMenu
-        onFilterChange={handleFilterChange}
-        category={formattedCategory}
-      />
+      <div className="filter-strip d-flex flex-wrap align-items-center justify-content-center gap-2 p-2 bg-light">
+        <select
+          className="form-select"
+          style={{ maxWidth: "200px", flex: "1 1 auto" }}
+          value={selectedSubcategory}
+          onChange={(e) => setSelectedSubcategory(e.target.value)}
+        >
+          <option value="">Select Subcategory</option>
+          {subcategories.map((subcat, index) => (
+            <option key={index} value={subcat}>
+              {subcat}
+            </option>
+          ))}
+        </select>
+        <input
+          type="number"
+          className="form-control"
+          style={{ maxWidth: "200px", flex: "1 1 auto" }}
+          placeholder="Start Price"
+          value={tempFilters.startPrice}
+          onChange={(e) =>
+            setTempFilters({ ...tempFilters, startPrice: e.target.value })
+          }
+        />
+        <input
+          type="number"
+          className="form-control"
+          style={{ maxWidth: "200px", flex: "1 1 auto" }}
+          placeholder="Last Price"
+          value={tempFilters.lastPrice}
+          onChange={(e) =>
+            setTempFilters({ ...tempFilters, lastPrice: e.target.value })
+          }
+        />
+        <button
+          className="btn btn-primary"
+          style={{ maxWidth: "100px", flex: "1 1 auto" }}
+          onClick={applyFilters}
+          disabled={
+            tempFilters.startPrice === filters.startPrice &&
+            tempFilters.lastPrice === filters.lastPrice &&
+            selectedSubcategory === filters.subcategory
+          }
+        >
+          Apply
+        </button>
+      </div>
       <div className="category-content">
         <h2>
           {formattedCategory}

@@ -3,18 +3,46 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import categoriesData from "../../data/categories";
 
-const TopMenu = ({ onFilterChange, category }) => {
+const TopMenu = ({ onFilterChange, category, hasPermission }) => {
   const [startPrice, setStartPrice] = useState("");
   const [lastPrice, setLastPrice] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
   const [subcategories, setSubcategories] = useState([]);
 
+  const showToast = (type, message) => {
+    if (type === "error") {
+      toast.error(message);
+    } else if (type === "success") {
+      toast.success(message);
+    }
+  };
+
   const handleFilterChange = () => {
-    if (startPrice && lastPrice && Number(startPrice) > Number(lastPrice)) {
-      toast.error("Start price cannot be greater than last price!");
+    if (!hasPermission) {
+      showToast("error", "Please Apply Any filter");
       return;
     }
-    onFilterChange({ startPrice, lastPrice, subcategory: selectedSubcategory });
+
+    if (startPrice && lastPrice && Number(startPrice) > Number(lastPrice)) {
+      showToast("error", "Start price cannot be greater than last price!");
+      return;
+    }
+
+    const newFilters = {
+      startPrice,
+      lastPrice,
+      subcategory: selectedSubcategory,
+    };
+    if (
+      newFilters.startPrice !== "" ||
+      newFilters.lastPrice !== "" ||
+      newFilters.subcategory !== ""
+    ) {
+      onFilterChange(newFilters); // Directly invoke onFilterChange
+      showToast("success", "Filters applied successfully!");
+    } else {
+      showToast("error", "No new filters to apply!");
+    }
   };
 
   useEffect(() => {
@@ -27,7 +55,7 @@ const TopMenu = ({ onFilterChange, category }) => {
 
   useEffect(() => {
     if (selectedSubcategory) {
-      onFilterChange({ subcategory: selectedSubcategory });
+      onFilterChange({ subcategory: selectedSubcategory }); // Directly invoke onFilterChange
     }
   }, [selectedSubcategory]);
 

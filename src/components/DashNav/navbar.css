@@ -34,15 +34,19 @@
 }
 .category-title {
   font-weight: bold;
-  color: #002f34;
+  color: #002f34 !important;
   margin-bottom: 5px;
 }
-.category-items div {
+.category-title:hover {
+  color: var(--bg-nav) !important;
+}
+.category-items {
   cursor: pointer;
+  color: #595959;
   padding: 3px 0;
 }
-.category-items div:hover {
-  color: #0288d1;
+.category-items:hover{
+  color: var(--bg-nav);
 }
 .location-info {
   position: relative;

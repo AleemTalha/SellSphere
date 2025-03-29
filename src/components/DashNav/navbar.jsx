@@ -139,10 +139,7 @@ const Navbar = ({ user, setLocation }) => {
         style={{ zIndex: 1 }}
       >
         <div className="item-1" ref={menuRef}>
-          <div
-            className="cursor-pointer"
-            onClick={() => setIsOpen(!isOpen)}
-          >
+          <div className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? (
               <div className="transition-all">
                 <span className="text-danger fw-bold">
@@ -164,20 +161,28 @@ const Navbar = ({ user, setLocation }) => {
             <div className="category-grid row text-start">
               {Categories.map((categoryData, i) => (
                 <div className="category col-lg-3 col-md-4 col-6" key={i}>
-                  <div className="category-title">{categoryData.category}</div>
+                  <div className="category-title">
+                    <NavLink
+                      to={`/category/${slugify(categoryData.category)}`}
+                      className="text-decoration-none category-title elong btn p-0 transition-all"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {categoryData.category}
+                    </NavLink>
+                  </div>
                   <div className="category-items">
                     {categoryData.items.map((item, idx) => (
-                      <>
+                      <div key={idx}>
                         <NavLink
-                          key={idx}
-                          to={`/category/${slugify(categoryData.category)}/${slugify(item)}`}
-                          className="text-dark text-decoration-none"
+                          to={`/category/${slugify(
+                            categoryData.category
+                          )}/${slugify(item)}`}
+                          className="text-decoration-none category-items elong btn p-0 transition-all"
                           onClick={() => setIsOpen(false)}
                         >
                           {item}
                         </NavLink>
-                        <br />
-                      </>
+                      </div>
                     ))}
                   </div>
                 </div>
