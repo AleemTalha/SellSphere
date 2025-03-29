@@ -92,3 +92,38 @@
     transform: scale(1);
   }
 }
+.d-card-wrapper {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 10px;
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
+}
+
+.d-card-wrapper::-webkit-scrollbar {
+  display: none; 
+}
+
+
+.d-card-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.d-card-container > * {
+  flex: 0 0 calc(100% / 2 - 10px); 
+}
+
+@media (min-width: 768px) {
+  .d-card-container > * {
+    flex: 0 0 calc(100% / 3 - 10px);
+    
+  }
+}
+
+@media (min-width: 992px) {
+  .d-card-container > * {
+    flex: 0 0 calc(100% / 5 - 10px);
+  }
+}

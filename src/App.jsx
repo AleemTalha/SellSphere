@@ -1,5 +1,10 @@
-import React, { Suspense, lazy } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { Suspense, lazy, useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 import "aos/dist/aos.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -10,7 +15,8 @@ import ItemPage from "./pages/ItemPage";
 import Listing from "./pages/Listing";
 
 const Login = lazy(() => import("./pages/user/login"));
-const Dashboard = lazy(() => import("./pages/user/dashboard/dashboard"));
+// const Dashboard = lazy(() => import("./pages/user/dashboard/dashboard"));
+import Dashboard from "./pages/user/dashboard/dashboard";
 const ErrorPage = lazy(() => import("./pages/error/ErrorPage"));
 const PostAd = lazy(() => import("./pages/user/postAd/postAd"));
 import Loading from "./components/loading";
@@ -20,11 +26,43 @@ const Contact = lazy(() => import("./pages/user/contact/Contact"));
 const FAQs = lazy(() => import("./pages/user/FAQs/faq"));
 const Profile = lazy(() => import("./pages/user/profile/Profile"));
 const About = lazy(() => import("./pages/About/About"));
+const ItemDetails = lazy(() => import("./pages/ItemDetails"));
+
+function TimeoutFallback() {
+  const [timeoutReached, setTimeoutReached] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setTimeoutReached(true);
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (timeoutReached) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          fontSize: "1.5rem",
+          color: "red",
+        }}
+      >
+        An error occurred. Please wait while we solve this issue.
+      </div>
+    );
+  }
+
+  return <Loading />;
+}
 
 function App() {
   return (
     <Router>
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<TimeoutFallback />}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
@@ -37,6 +75,7 @@ function App() {
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/item/:category/:subcategory" element={<ItemPage />} />
           <Route path="/listing" element={<Listing />} />
+          <Route path="/item-id/:id/:category/" element={<ItemDetails />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </Suspense>

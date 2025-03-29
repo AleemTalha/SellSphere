@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,6 +11,10 @@ const Contact = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
+
+  useEffect(() => {
+    document.title = "SellSphere - Customer Support";
+  }, []);
 
   const showToast = (message, flag) => {
     if (flag) {
@@ -36,6 +40,7 @@ const Contact = () => {
     showToast("Message sent successfully", true);
   };
 
+
   return (
     <>
       <ToastContainer />
@@ -43,16 +48,16 @@ const Contact = () => {
         <NavLink to="/" className="brand">
           <img src="/images/logo2.png" alt="logo" className="logo-2" />
         </NavLink>
-        <div className="nav-links d-flex gap-2">
+        <div className="nav-links d-flex gap-4">
           <NavLink
             to="/"
-            className="btn  elong transition-all nav-link text-light text-decoration-none"
+            className="btn elong transition-all nav-link text-light text-decoration-none"
           >
             Home
           </NavLink>
           <NavLink
             to="/faqs"
-           className="btn  elong transition-all nav-link text-light text-decoration-none"
+           className="btn elong transition-all nav-link text-light text-decoration-none"
           >
             FAQs
           </NavLink>

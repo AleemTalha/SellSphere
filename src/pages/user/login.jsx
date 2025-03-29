@@ -35,7 +35,7 @@ const login = () => {
   };
   const combineOTP = () => {
     const otpValues = otpRefs.current.map((input) => input?.value.trim());
-    return otpValues.join(""); // Combine OTPs into one string
+    return otpValues.join("");
   };
   const showToast = (message, flag) => {
     if (flag) {
@@ -436,6 +436,13 @@ const login = () => {
                   </div>
                 ) : isLogin === "otp" ? (
                   <div className="form-content slide-in">
+                        <button className="btn border-0 " 
+                        onClick={() => {
+                          setIsLogin("register");
+                          reset();
+                        }}>
+                          <i className="bi bi-arrow-left h2"></i>
+                        </button>
                     <div className="d-flex justify-content-center align-items-center">
                       <form
                         autoComplete="on"

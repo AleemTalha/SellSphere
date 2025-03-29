@@ -79,7 +79,6 @@
   background: #0056b3;
 }
 
-/* Hover effect on profile image */
 .profile-image-container {
   position: relative;
   display: inline-block;
@@ -131,6 +130,27 @@
   background: #f0f2f5;
   padding-top: 20px;
 }
+
+.profile-skeleton-img {
+  width: 150px !important;
+  height: 150px !important;
+  background-color: #e0e0e0;
+  border-radius: 50% !important;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+  50% {
+    background-color: #d6d6d6;
+  }
+  100% {
+    background-color: #e0e0e0;
+  }
+}
+
 
 .profile-content {
   text-align: center;

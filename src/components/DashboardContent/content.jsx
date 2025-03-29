@@ -22,7 +22,7 @@ const Content = (props) => {
     },
     {
       image: bg3,
-      heading: "Your Marketplace, Your Rules!",
+      heading: `Your Marketplace, Your Rules, Your Way!`,
       text: "List, Negotiate, and Seal the Deal on Your Terms",
     },
   ];
@@ -79,11 +79,13 @@ const Content = (props) => {
         <div className="hero-section">
           <div className="hero-inside d-flex justify-content-center align-items-center">
             <div>
-              <div className="border-text text-light scale-in">
+              <div className="border-text text-light scale-in mx-0 px-0">
                 <h2 className="p-0 m-0">{slides[currentSlide].heading}</h2>
                 <p className="p-0 m-0">{slides[currentSlide].text}</p>
-                <div className="button-container pt-3 d-flex justify-content-center gap-4">
-                  <button className="btn bg-transparent text-light border" onClick={scrollMore}>
+                <div className="button-container pt-3 d-flex justify-content-center gap-2 gap-sm-4">
+                  <button className="btn px-1 py-1 bg-transparent text-light border"
+                   onClick={scrollMore}
+                   >
                     Explore More
                   </button>
                   <button className="btn bg-nav text-light  cursor-pointer" onClick={postAd} style={{zIndex:2}}>

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, NavLink } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import categoriesData from "../../../data/categories";
+import Loading from "../../../components/loading";
 
 const PostAd = () => {
   const [userLogin, setUserLogin] = useState(false);
@@ -17,6 +18,8 @@ const PostAd = () => {
   const selectedCategory = watch("category");
   const selectedSubCategory = watch("subCategory");
   const navigate = useNavigate();
+  const [userLocation, setUserLocation] = useState(null);
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   useEffect(() => {
     setCategories(categoriesData);
@@ -34,10 +37,9 @@ const PostAd = () => {
       theme: "light",
       newestOnTop: true,
     };
-  
+
     flag ? toast.success(message, options) : toast.error(message, options);
   };
-  
 
   useEffect(() => {
     const function1 = async () => {
@@ -67,6 +69,22 @@ const PostAd = () => {
       setSubCategories([]);
     }
   }, [selectedCategory, categories]);
+
+  useEffect(() => {
+    const location = JSON.parse(localStorage.getItem("userLocation"));
+    if (location) {
+      setUserLocation(location);
+    } else {
+      showToast("Location not found. Please set your location.", false);
+      setShowLocationModal(true);
+    }
+  }, []);
+
+
+  useEffect(() => {
+    document.title = "SellSphere - Post Your Ad";
+  }, []);
+
   const submitCategoryData = async (data) => {
     try {
       const API_URI = import.meta.env.VITE_API_URL;
@@ -93,6 +111,11 @@ const PostAd = () => {
   };
 
   const onSubmit = async (data) => {
+    if (!userLocation) {
+      showToast("Location data is missing. Cannot submit ad.", false);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const API_URI = import.meta.env.VITE_API_URL;
@@ -106,19 +129,20 @@ const PostAd = () => {
         formData.append("image", data.image[0]);
       }
 
+      formData.append("latitude", userLocation.latitude);
+      formData.append("longitude", userLocation.longitude);
+
       const response = await fetch(`${API_URI}/post/ads`, {
         method: "POST",
         credentials: "include",
         body: formData,
       });
-
       const result = await response.json();
-
       if (result.success) {
         showToast(result.message || "Ad posted successfully!", true);
-        // reset();
-        // navigate("/");
-        // setImagePreview(null);
+        reset();
+        navigate("/");
+        setImagePreview(null);
       } else {
         showToast(result.message || "Ad posting failed", false);
       }
@@ -162,18 +186,17 @@ const PostAd = () => {
               <img src="/images/logo2.png" className="logo-2" />
             </NavLink>
             <button
-              onClick={()=>{
-                if(!isSubmitted){
+              onClick={() => {
+                if (!isSubmitted) {
                   navigate(-1);
-                } else
-                {
+                } else {
                   setIsSubmitted(false);
-                setSetted(false);
-                setValue("category", "");
-                setValue("subCategory", "");
-                setValue("image", "");
-                setImagePreview(null);
-                reset();
+                  setSetted(false);
+                  setValue("category", "");
+                  setValue("subCategory", "");
+                  setValue("image", "");
+                  setImagePreview(null);
+                  reset();
                 }
               }}
               className="btn btn-outline-light d-flex align-items-center"
@@ -240,17 +263,20 @@ const PostAd = () => {
               ) : (
                 <div className="container p-4 border rounded shadow bg-white">
                   <div className="d-flex align-items-center mb-3">
-                    <button className="btn btn-light me-2"
-                    onClick={()=>{
-                      setIsSubmitted(false);
-                      setSetted(false);
-                      setValue("category", "");
-                      setValue("subCategory", "");
-                      setValue("image", "");
-                      setImagePreview(null);
-                      reset();
-                    }}
-                    >← Back</button>
+                    <button
+                      className="btn text-dark border border-2 me-2"
+                      onClick={() => {
+                        setIsSubmitted(false);
+                        setSetted(false);
+                        setValue("category", "");
+                        setValue("subCategory", "");
+                        setValue("image", "");
+                        setImagePreview(null);
+                        reset();
+                      }}
+                    >
+                      ← Back
+                    </button>
                     <h2 className="text-center flex-grow-1">Post Your Ad</h2>
                   </div>
 
@@ -277,7 +303,9 @@ const PostAd = () => {
                           style={{ objectFit: "cover" }}
                         />
                       ) : (
-                        <p className="text-muted">No image selected <br /> Please upload a square image</p>
+                        <p className="text-muted">
+                          No image selected <br /> Please upload a square image
+                        </p>
                       )}
                       <input
                         type="file"
@@ -418,6 +446,7 @@ const PostAd = () => {
                       placeholder="Write a short description"
                       required
                       {...register("description")}
+                      style={{minHeight: "200px"}}
                     ></textarea>
                   </div>
 
@@ -451,15 +480,20 @@ const PostAd = () => {
                 <div className="text-center mt-4">
                   <button
                     type="submit"
-                    className="btn btn-primary"
+                    className="btn elong transition-all"
+                    style={{ border: "2px solid var(--bg-nav)" }}
                     disabled={
                       !selectedCategory || !selectedSubCategory || isSubmitting
                     }
                   >
-                    {isSubmitting ? (
+                    {!submitCategoryData ? (
                       <span className="spinner-border spinner-border-sm me-2"></span>
                     ) : (
-                      "Next"
+                      <>
+                        <div>
+                          Next <i className="b- bi-arrow-right"></i>
+                        </div>
+                      </>
                     )}
                   </button>
                 </div>
@@ -473,9 +507,40 @@ const PostAd = () => {
             className="text-center h2 pt-5"
             style={{ color: "var(--bg-nav)" }}
           >
-            User not loggedd in
+            <Loading />
           </div>
         </>
+      )}
+      {showLocationModal && (
+        <div
+          className="modal fade show d-block"
+          tabIndex="-1"
+          role="dialog"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Location Required</h5>
+              </div>
+              <div className="modal-body">
+                <p>
+                  Your location is not set. Please go to the dashboard and set
+                  your location to proceed.
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Go to Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./card.css";
 
-const Card = ({ image, title, price, description }) => {
+const Card = ({ image, title, price, description, postId, onCardHidden }) => {
   const [showMore, setShowMore] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [deleting, setDeleting] = useState(false); 
+  const [hidden, setHidden] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -20,52 +22,120 @@ const Card = ({ image, title, price, description }) => {
     };
   }, []);
 
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/profile/delete/${postId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
+      if (response.ok) {
+        setHidden(true); 
+        onCardHidden(postId);
+      } else {
+        alert(result.message || "Failed to delete the post.");
+      }
+    } catch (error) {
+      alert("Failed to delete the post: " + error.message);
+    } finally {
+      setDeleting(false); 
+    }
+  };
+
+  if (hidden) {
+    return null; 
+  }
+
   return (
     <div className="post-card">
-      <div className="post-header">
-        <p className="post-title">
-          {imageLoaded ? title : <div className="skeleton-text skeleton-title"></div>}
-        </p>
+      <div className="post-header text-light bg-nav h-100 w-100">
+        <div className="post-title text-center w-100 text-center">
+          {imageLoaded ? (
+            title
+          ) : (
+            <div className="skeleton-text skeleton-title"></div>
+          )}
+        </div>
         <div className="post-menu" ref={menuRef}>
-          <button className="menu-btn" onClick={() => setMenuOpen(!menuOpen)}>⋮</button>
+          <button className="menu-btn text-light" onClick={() => setMenuOpen(!menuOpen)}>
+            ⋮
+          </button>
           {menuOpen && (
             <div className="menu-options">
               <button className="menu-item">Edit</button>
-              <button className="menu-item">Delete</button>
-              <button className="menu-item">Share</button>
+              <button
+                className="menu-item"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                Delete
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      <p className="post-price">
-        {imageLoaded ? `Price: ${price}` : <div className="skeleton-text skeleton-price"></div>}
-      </p>
-
-      <div className="post-image-container">
-        {!imageLoaded && <div className="skeleton-image"></div>}
-        <img 
-          src={image} 
-          alt="Post" 
-          className={`post-image ${imageLoaded ? "visible" : "hidden"}`} 
-          onLoad={() => setImageLoaded(true)} 
-        />
+      <div className="post-price text-dark text-center">
+        {imageLoaded ? (
+          `Price: ${price}`
+        ) : (
+          <div className="skeleton-text skeleton-price"></div>
+        )}
       </div>
 
-      <p className="post-description">
-        {imageLoaded ? (
-          <>
-            {showMore ? description : description.slice(0, 100)}
-            {description.length > 100 && (
-              <span className="see-more" onClick={() => setShowMore(!showMore)}>
-                {showMore ? " See Less" : " ...See More"}
-              </span>
-            )}
-          </>
+      <div className="post-description">
+  {imageLoaded ? (
+    <>
+      <span
+        dangerouslySetInnerHTML={{
+          __html: (showMore ? description : description.slice(0, 100)).replace(/\n/g, "<br/>"),
+        }}
+      />
+      {description.length > 100 && (
+        <span className="see-more" onClick={() => setShowMore(!showMore)}>
+          {showMore ? " See Less" : " ...See More"}
+        </span>
+      )}
+    </>
+  ) : (
+    <div className="skeleton-text skeleton-description"></div>
+  )}
+</div>
+
+
+      <div className="post-image-container">
+        {deleting ? (
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "200px" }}
+          >
+            <div
+              className="spinner-border text-danger"
+              role="status"
+              style={{ width: "2rem", height: "2rem" }}
+            >
+              <span className="visually-hidden">Deleting...</span>
+            </div>
+          </div>
         ) : (
-          <div className="skeleton-text skeleton-description"></div>
+          <>
+            {!imageLoaded && <div className="skeleton-image"></div>}
+            <img
+              src={image}
+              alt="Post"
+              className={`post-image ${imageLoaded ? "visible" : "hidden"}`}
+              onLoad={() => setImageLoaded(true)}
+            />
+          </>
         )}
-      </p>
+      </div>
     </div>
   );
 };

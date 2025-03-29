@@ -6,6 +6,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Forgot = () => {
+
+  useEffect(() => {
+    document.title = "SellSphere - Forgot Password";
+  }, []);
   const [form, setForm] = useState("email");
   const navigate = useNavigate();
   const [isOTPComplete, setIsOTPComplete] = useState(false);

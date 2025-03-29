@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "../../../components/loginNav/navbar";
 import "./policy.css";
 
 const Policy = () => {
+
+
+  useEffect(() => {
+    document.title = "SellSphere - Terms & Conditions";
+  }, []);
   return (
     <>
       <Navbar />

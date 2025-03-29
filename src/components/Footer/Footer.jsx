@@ -1,79 +1,34 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import "./Footer.css";
 
 const Footer = () => {
   return (
-    <footer className="footer">
+    <footer className="bg-nav text-light py-4">
       <div className="container">
-        <div className="row footer-container">
-          <div className="col-12 col-md-4 col-lg-3 footer-section logo">
-            <img
-              src="/images/logo2.png"
-              alt="Brand Logo"
-              className="brand-logo"
-            />
+        <div className="row text-center text-md-start">
+          <div className="col-md-4 mb-3 mb-md-0 d-flex flex-column align-items-center align-items-md-start">
+            <NavLink to="/" className="d-flex align-items-center mb-2">
+              <img src="/images/logo2.png" alt="logo" className="img-fluid" style={{ maxWidth: "150px" }} />
+            </NavLink>
           </div>
-          <div className="col-12 col-md-4 col-lg-3 footer-section links">
-            <h4>Quick Links</h4>
-            <ul>
-              <li>
-                <NavLink to="/about">About</NavLink>
-              </li>
-              <li>
-                <NavLink to="/contact">Contact</NavLink>
-              </li>
-              <li>
-                <NavLink to="/policy">Terms and Conditions</NavLink>
-              </li>
+          <div className="col-md-4 d-none d-lg-flex mb-3 mb-md-0 flex-column align-items-center align-items-md-start">
+            <h5>Contact Us</h5>
+            <p className="mb-1">Email: info@yourcompany.com</p>
+            <p className="mb-1">Phone: +1 (123) 456-7890</p>
+            <p className="mb-0">Address: 123 Business Street, City, Country</p>
+          </div>
+          <div className="col-md-4 d-flex flex-column align-items-center align-items-md-start">
+            <h5>Quick Links</h5>
+            <ul className="list-unstyled d-flex flex-lg-column flex-row gap-4 gap-lg-1">
+              <li><NavLink to="/about" className="text-light text-decoration-underline" style={{textUnderlineOffset:"3px"}}>About Us</NavLink></li>
+              <li><NavLink to="/contact" className="text-light text-decoration-underline" style={{textUnderlineOffset:"3px"}}>Contact</NavLink></li>
+              <li><NavLink to="/policy" className="text-light text-decoration-underline" style={{textUnderlineOffset:"3px"}}>Privacy Policy</NavLink></li>
             </ul>
           </div>
-          <div className="col-12 col-md-4 col-lg-3 footer-section contact">
-            <h4>Contact Us</h4>
-            <p>
-              Email: info@example.com
-              <br />
-              Phone: +123 456 7890
-              <br />
-              Address: 123 Street, City, Country
-            </p>
-          </div>
-          <div className="col-12 col-md-4 col-lg-3 footer-section social">
-            <h4>Follow Us</h4>
-            <div className="social-icons">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bi bi-facebook"></i>
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bi bi-twitter"></i>
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bi bi-instagram"></i>
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bi bi-linkedin"></i>
-              </a>
-            </div>
-          </div>
         </div>
-        <div className="footer-bottom">
-          <p>&copy; 2023 Your Company. All rights reserved.</p>
+        <hr />
+        <div className="text-center mt-3">
+          <p className="mb-0">&copy; {new Date().getFullYear()} SellSphere. All rights reserved.</p>
         </div>
       </div>
     </footer>

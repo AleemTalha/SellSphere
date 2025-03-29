@@ -54,7 +54,7 @@ const Navbar = ({ user, setLocation }) => {
         setCity(data.city || data.locality || "");
         setCountry(data.countryName || "");
       } catch (error) {
-        showToast("Error fetching location data", false);
+        // showToast("Error fetching location data", false);
       }
     };
 
@@ -77,7 +77,7 @@ const Navbar = ({ user, setLocation }) => {
             updateLocation(latitude, longitude);
           },
           (error) => {
-            showToast(false, "Error getting location: ");
+            // showToast(false, "Error getting location: ");
             if (error.code === error.PERMISSION_DENIED) {
               showToast(
                 "Permission denied. Please allow location access.",
@@ -140,7 +140,7 @@ const Navbar = ({ user, setLocation }) => {
       >
         <div className="item-1" ref={menuRef}>
           <div
-            className="cursor-pointer px-5"
+            className="cursor-pointer"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? (
@@ -162,23 +162,23 @@ const Navbar = ({ user, setLocation }) => {
 
           <div className={`drop-down ${isOpen ? "show" : ""}`}>
             <div className="category-grid row">
-              {Categories.map((categoryData, index) => (
-                <div className="category col-lg-3 col-md-4 col-6" key={index}>
+              {Categories.map((categoryData, i) => (
+                <div className="category col-lg-3 col-md-4 col-6" key={i}>
                   <div className="category-title">{categoryData.category}</div>
                   <div className="category-items">
                     {categoryData.items.map((item, idx) => (
                       <>
                         <NavLink
-                        key={idx}
-                        to={`/item/${slugify(categoryData.category, {
-                          lower: true,
-                        })}/${slugify(item, { lower: true })}`}
-                        className="text-dark text-decoration-none"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {item}
-                      </NavLink>
-                      <br />
+                          key={idx}
+                          to={`/item/${slugify(categoryData.category, {
+                            lower: true,
+                          })}/${slugify(item, { lower: true })}`}
+                          className="text-dark text-decoration-none"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {item}
+                        </NavLink>
+                        <br />
                       </>
                     ))}
                   </div>
@@ -213,11 +213,15 @@ const Navbar = ({ user, setLocation }) => {
           ) : (
             <span className="fw-bold">
               {city}
-              {"," + country}
+              {city ? ", " : ""}
+              {country}
             </span>
           )}
           {!city && (
-            <button onClick={retryLocation} className="btn btn-danger">
+            <button
+              onClick={retryLocation}
+              className="btn btn-danger py-0 px-2"
+            >
               No Location
             </button>
           )}
