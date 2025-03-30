@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { set, useForm } from "react-hook-form";
 import "./login.css";
 import Navbar from "../../components/loginNav/navbar";
+import Footer from "../../components/Footer/Footer";
 import Loading from "../../components/loading";
 
 const login = () => {
@@ -127,12 +128,15 @@ const login = () => {
       } else if (isLogin === "password") {
         setIsLogin("login");
       } else if (isLogin === "login") {
-        navigate("/");
+        // console.log(responseData);
+        if (responseData.role === "user") {
+          navigate("/");
+        } else if (responseData.role === "admin") {
+          navigate("/admin/dashboard");
+        }
       }
       showToast(responseData.message, true);
-    }
-    else if(!responseData.success)
-    {
+    } else if (!responseData.success) {
       showToast(responseData.message, false);
     }
   };
@@ -161,7 +165,7 @@ const login = () => {
       {loading ? (
         <Loading />
       ) : (
-        <div className="row m-0 login-page">
+        <div className="row m-0 login-page border border-2">
           <div className="row p-0 m-0" style={{ minHeight: "730px" }}>
             <div className="col-lg-5 col-md-6 pt-5">
               <div
@@ -436,13 +440,15 @@ const login = () => {
                   </div>
                 ) : isLogin === "otp" ? (
                   <div className="form-content slide-in">
-                        <button className="btn border-0 " 
-                        onClick={() => {
-                          setIsLogin("register");
-                          reset();
-                        }}>
-                          <i className="bi bi-arrow-left h2"></i>
-                        </button>
+                    <button
+                      className="btn border-0 "
+                      onClick={() => {
+                        setIsLogin("register");
+                        reset();
+                      }}
+                    >
+                      <i className="bi bi-arrow-left h2"></i>
+                    </button>
                     <div className="d-flex justify-content-center align-items-center">
                       <form
                         autoComplete="on"
@@ -754,6 +760,25 @@ const login = () => {
           </div>
         </div>
       )}
+      {isLogin === "login" && (
+        <div className="pt-5 mt-5 text-center">
+          <p className="text-danger fw-bold">
+            If your account is blocked.{" "}
+            <NavLink
+              to="/unblock-account"
+              className="text-primary text-decoration-none"
+            >
+              Click here to send application unblock your account
+            </NavLink>
+          </p>
+          <div className="mb-4">
+            <NavLink className="text-decoration-none bg-nav btn">
+              <span className="text-light fw-bold">Unblock Application</span>
+            </NavLink>
+          </div>
+        </div>
+      )}
+      <Footer />
     </div>
   );
 };

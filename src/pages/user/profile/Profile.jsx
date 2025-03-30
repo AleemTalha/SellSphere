@@ -71,15 +71,21 @@ const Profile = () => {
       );
 
       const result = await response.json();
+      if(response.status === 403) {
+        showToastMessage(false, "You are not authorized to view this profile.");
+        navigate("/error");
+        return<>
+        </>;
+      }
       if (response.ok) {
         setPosts((prevPosts) => [...prevPosts, ...result.user.posts]);
         if (result.user.posts.length > 0) {
           setLastPostId(result.user.posts[result.user.posts.length - 1]._id);
         }
-        setLastOne(result.lastOne); // Update lastOne state
+        setLastOne(result.lastOne); 
         if (isInitial) {
           setImgUrl(result.user.profileImage?.url || "/images/default.png");
-          setUser(result.user); // Set user data
+          setUser(result.user);
         }
       } else {
         showToastMessage(false, result.message || "Failed to fetch posts");

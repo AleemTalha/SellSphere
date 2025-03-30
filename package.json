@@ -19,6 +19,8 @@
     "framer-motion": "^12.5.0",
     "fs": "^0.0.1-security",
     "fuse.js": "^7.1.0",
+    "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",

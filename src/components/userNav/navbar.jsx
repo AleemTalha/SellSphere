@@ -71,47 +71,48 @@ const Navbar = ({ user, setUser }) => {
         </NavLink>
         <div className="nav-links">
           {user ? (
-            <div className="user-menu">
-              <div className="user-info">
-                {!imageLoaded && <div className="skeleton-image"></div>}
-                <img
-                  src={user.profileImage?.url || "/images/default.png"}
-                  alt="Profile"
-                  className={`user-image ${!imageLoaded ? "d-none" : ""}`}
-                  onLoad={handleImageLoad}
-                />
-                <span className="user-name">{user.fullName}</span>
-              </div>
-              <div className="dropdown-content">
-                <NavLink
-                  to={`/profile/${user._id}`}
-                  state={{ userId: user._id }}
-                  className="dropdown-link nav-link text-black text-decoration-none"
-                >
-                  Profile
-                </NavLink>
-                <button
-                  onClick={handleLogout}
-                  className="dropdown-link nav-link text-black text-decoration-none"
-                  disabled={isLoggingOut}
-                >
-                  {isLoggingOut ? (
-                    <>
-                      <div
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        style={{ color: "#ffcc00" }}
-                      >
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                      Logging out...
-                    </>
-                  ) : (
-                    "Logout"
-                  )}
-                </button>
-              </div>
-            </div>
+           <div className="user-menu">
+           <div className="user-info">
+             {!imageLoaded && <div className="user-skeleton-loader"></div>}
+             <img
+               src={user.profileImage?.url || "/images/default.png"}
+               alt="Profile"
+               className={`user-image ${!imageLoaded ? "d-none" : ""}`}
+               onLoad={handleImageLoad}
+             />
+             <span className="user-user-name">{user.fullName}</span>
+           </div>
+           <div className="user-dropdown-content">
+             <NavLink
+               to={`/profile/${user._id}`}
+               state={{ userId: user._id }}
+               className="user-dropdown-link nav-link text-black text-decoration-none"
+             >
+               Profile
+             </NavLink>
+             <button
+               onClick={handleLogout}
+               className="user-dropdown-link nav-link text-black text-decoration-none"
+               disabled={isLoggingOut}
+             >
+               {isLoggingOut ? (
+                 <>
+                   <div
+                     className="spinner-border spinner-border-sm"
+                     role="status"
+                     style={{ color: "#ffcc00" }}
+                   >
+                     <span className="visually-hidden">Loading...</span>
+                   </div>
+                   Logging out...
+                 </>
+               ) : (
+                 "Logout"
+               )}
+             </button>
+           </div>
+         </div>
+         
           ) : (
             <div className="auth-links d-flex">
               <NavLink

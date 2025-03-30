@@ -107,24 +107,25 @@ const Card = ({ ad }) => {
               />
             </div>
             <div className="d-flex justify-content-between align-items-center d-none d-md-flex">
-  <p className="location mb-0">
-    <strong>
-      <i className="bi bi-geo-alt"></i>
-    </strong>{" "}
-    {locationName}
-  </p>
-  <p className="time-ago mb-0">
-    {(() => {
-      const now = new Date();
-      const diff = Math.floor((now - new Date(createdAt)) / 1000);
-      if (diff < 60) return `${diff} seconds ago`;
-      if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-      return `${Math.floor(diff / 86400)} days ago`;
-    })()}
-  </p>
-</div>
-
+              <p className="location mb-0">
+                <strong>
+                  <i className="bi bi-geo-alt"></i>
+                </strong>{" "}
+                {locationName}
+              </p>
+              <p className="time-ago mb-0">
+                {(() => {
+                  const now = new Date();
+                  const diff = Math.floor((now - new Date(createdAt)) / 1000);
+                  if (diff < 60) return `${diff} seconds ago`;
+                  if (diff < 3600)
+                    return `${Math.floor(diff / 60)} minutes ago`;
+                  if (diff < 86400)
+                    return `${Math.floor(diff / 3600)} hours ago`;
+                  return `${Math.floor(diff / 86400)} days ago`;
+                })()}
+              </p>
+            </div>
 
             <p className="price">
               <strong>

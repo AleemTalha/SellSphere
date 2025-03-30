@@ -223,7 +223,7 @@ const Navbar = ({ user, setLocation }) => {
           {!city && (
             <button
               onClick={retryLocation}
-              className="btn btn-danger py-0 px-2"
+              className="btn btn-danger py-0 px-2 m-0"
             >
               No Location
             </button>
