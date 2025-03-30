@@ -80,7 +80,6 @@ const PostAd = () => {
     }
   }, []);
 
-
   useEffect(() => {
     document.title = "SellSphere - Post Your Ad";
   }, []);
@@ -379,22 +378,72 @@ const PostAd = () => {
                     <>
                       <div className="d-flex gap-3">
                         <div className="mb-3 flex-grow-1">
-                          <label className="form-label">Area (sq ft)</label>
+                          <label className="form-label">Location City</label>
                           <input
-                            type="number"
+                            type="text"
                             className="form-control"
-                            placeholder="Enter Area"
-                            {...register("Area")}
+                            placeholder="Enter City"
+                            {...register("locationCity")}
+                            required
                           />
                         </div>
                         <div className="mb-3 flex-grow-1">
-                          <label className="form-label">Rooms</label>
+                          <label className="form-label">Bedrooms</label>
                           <input
                             type="number"
                             className="form-control"
-                            placeholder="Enter Number of Rooms"
-                            {...register("Rooms")}
+                            placeholder="Enter Number of Bedrooms"
+                            {...register("bedrooms")}
+                            min="1"
+                            required
                           />
+                        </div>
+                      </div>
+                      <div className="d-flex gap-3">
+                        <div className="mb-3 flex-grow-1">
+                          <label className="form-label">Bathrooms</label>
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Enter Number of Bathrooms"
+                            {...register("bathrooms")}
+                            min="1"
+                            required
+                          />
+                        </div>
+                        <div className="mb-3 flex-grow-1">
+                          <label className="form-label d-block">
+                            Furnished
+                          </label>
+                          <div className="btn-group w-100" role="group">
+                            <input
+                              type="radio"
+                              className="btn-check"
+                              id="furnishedYes"
+                              value="true"
+                              {...register("furnished")}
+                            />
+                            <label
+                              className="btn btn-outline-primary"
+                              htmlFor="furnishedYes"
+                            >
+                              Yes
+                            </label>
+
+                            <input
+                              type="radio"
+                              className="btn-check"
+                              id="furnishedNo"
+                              value="false"
+                              {...register("furnished")}
+                            />
+                            <label
+                              className="btn btn-outline-secondary"
+                              htmlFor="furnishedNo"
+                            >
+                              No
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </>
@@ -446,7 +495,7 @@ const PostAd = () => {
                       placeholder="Write a short description"
                       required
                       {...register("description")}
-                      style={{minHeight: "200px"}}
+                      style={{ minHeight: "200px" }}
                     ></textarea>
                   </div>
 

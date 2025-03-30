@@ -19,7 +19,7 @@ const ItemDetails = () => {
       try {
         const API_URI = import.meta.env.VITE_API_URL + `/dashboard/items/${id}`;
         const response = await fetch(API_URI, {
-          credentials: "include", // Include credentials in the request
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -28,12 +28,12 @@ const ItemDetails = () => {
         });
 
         if (response.status === 401) {
-          navigate("/login"); // Redirect to login page
+          navigate("/login");
           return;
         }
 
         if (response.status === 403) {
-          setError("This page is only accessible to local users."); // Show forbidden message
+          setError("This page is only accessible to local users.");
           return;
         }
 
@@ -62,118 +62,121 @@ const ItemDetails = () => {
     fetchItemData();
   }, [id, navigate]);
 
-  if (loading) {
-    return (
-      <div className="container">
-        <div className="row">
-          <div className="col-md-6 skeleton skeleton-image"></div>
-          <div className="col-md-6">
-            <div className="skeleton skeleton-title"></div>
-            <div className="skeleton skeleton-price"></div>
-            <div className="skeleton skeleton-text"></div>
-            <div className="skeleton skeleton-text"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) return <div className="container text-danger">Error: {error}</div>;
-
   return (
     <>
       <NavBar />
       <div className="container mt-5">
-        <Menu
-          category={itemData.category}
-          phoneNumber={itemData.contactNumber}
-        />
-        <div className="row">
-          <div className="col-md-6 d-flex justify-content-center align-items-center">
-            <img
-              className="item-image"
-              src={itemData.image.url}
-              alt={itemData.title}
-            />
-          </div>
-          <div className="col-md-6 px-5 px-lg-2">
-            <h1 className="item-title">{itemData.title}</h1>
-            <p className="item-price">Rs {itemData.price.toLocaleString()}</p>
-            <p className="item-details">
-              <span className="item-details-label">Condition:</span>{" "}
-              {itemData.condition}
-            </p>
-            <p className="item-details">
-              <span className="item-details-label">Location:</span>{" "}
-              {location
-                ? `${location.city}, ${location.countryName}`
-                : "Fetching location..."}
-            </p>
-            <p className="item-details">
-              <span className="item-details-label">Contact:</span>{" "}
-              {itemData.showNumber ? itemData.contactNumber : "Hidden"}
-            </p>
-            <div className="d-flex justify-content-end align-items-center p-2 rounded">
-            <ReportMenu
-              itemId={id}
-              title={itemData.title}
-              createdBy={itemData.createdBy}
-              type={itemData.category}
-              postedBy={itemData.postedBy}
-            />
+        {loading ? (
+          <div className="row">
+            <div className="col-md-6 skeleton skeleton-image"></div>
+            <div className="col-md-6">
+              <div className="skeleton skeleton-title"></div>
+              <div className="skeleton skeleton-price"></div>
+              <div className="skeleton skeleton-text"></div>
+              <div className="skeleton skeleton-text"></div>
             </div>
           </div>
-        </div>
-        {itemData.category === "Cars" && (
-          <div className="item-extra-details">
-            <p>
-              <span className="item-details-label">Make:</span>{itemData.Make}
-            </p>
-            <p>
-              <span className="item-details-label">Model:</span>
-              {itemData.Model}
-            </p>
-            <p>
-              <span className="item-details-label">Year:</span> {itemData.Year}
-            </p>
-            <p>
-              <span className="item-details-label">Mileage:</span>
-              {itemData.Mileage} km <span className="text-muted">(Driven)</span>
-            </p>
-          </div>
+        ) : error ? (
+          <div className="container text-danger">Error: {error}</div>
+        ) : (
+          <>
+            <Menu
+              category={itemData.category}
+              phoneNumber={itemData.contactNumber}
+            />
+            <div className="row">
+              <div className="col-md-6 d-flex justify-content-center align-items-center">
+                <img
+                  className="item-image"
+                  src={itemData.image.url}
+                  alt={itemData.title}
+                />
+              </div>
+              <div className="col-md-6 px-5 px-lg-2">
+                <h1 className="item-title">{itemData.title}</h1>
+                <p className="item-price">
+                  Rs {itemData.price.toLocaleString()}
+                </p>
+                <p className="item-details">
+                  <span className="item-details-label">Condition:</span>{" "}
+                  {itemData.condition}
+                </p>
+                <p className="item-details">
+                  <span className="item-details-label">Location:</span>{" "}
+                  {location
+                    ? `${location.city}, ${location.countryName}`
+                    : "Fetching location..."}
+                </p>
+                <p className="item-details">
+                  <span className="item-details-label">Contact:</span>{" "}
+                  {itemData.showNumber ? itemData.contactNumber : "Hidden"}
+                </p>
+                <div className="d-flex justify-content-end align-items-center p-2 rounded">
+                  <ReportMenu
+                    itemId={id}
+                    title={itemData.title}
+                    createdBy={itemData.createdBy}
+                    type={itemData.category}
+                    postedBy={itemData.postedBy}
+                  />
+                </div>
+              </div>
+            </div>
+            {itemData.category === "Cars" && (
+              <div className="item-extra-details">
+                <p>
+                  <span className="item-details-label">Make:</span>
+                  {itemData.Make}
+                </p>
+                <p>
+                  <span className="item-details-label">Model:</span>
+                  {itemData.Model}
+                </p>
+                <p>
+                  <span className="item-details-label">Year:</span>{" "}
+                  {itemData.Year}
+                </p>
+                <p>
+                  <span className="item-details-label">Mileage:</span>
+                  {itemData.Mileage} km{" "}
+                  <span className="text-muted">(Driven)</span>
+                </p>
+              </div>
+            )}
+            {itemData.category === "House" && (
+              <div className="item-extra-details">
+                <p>
+                  <span className="item-details-label">City:</span>{" "}
+                  {itemData.locationCity}
+                </p>
+                <p>
+                  <span className="item-details-label">Bedrooms:</span>{" "}
+                  {itemData.bedrooms}
+                </p>
+                <p>
+                  <span className="item-details-label">Bathrooms:</span>{" "}
+                  {itemData.bathrooms}
+                </p>
+                <p>
+                  <span className="item-details-label">Area:</span>{" "}
+                  {itemData.area} sq.ft
+                </p>
+                <p>
+                  <span className="item-details-label">Furnished:</span>{" "}
+                  {itemData.furnished ? "Yes" : "No"}
+                </p>
+              </div>
+            )}
+            <div className="item-description">
+              <p className="item-details-label">Description:</p>
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: itemData.description.replace(/\r\n|\n|\r/g, "<br/>"),
+                }}
+              />
+            </div>
+          </>
         )}
-        {itemData.category === "House" && (
-          <div className="item-extra-details">
-            <p>
-              <span className="item-details-label">City:</span>{" "}
-              {itemData.locationCity}
-            </p>
-            <p>
-              <span className="item-details-label">Bedrooms:</span>{" "}
-              {itemData.bedrooms}
-            </p>
-            <p>
-              <span className="item-details-label">Bathrooms:</span>{" "}
-              {itemData.bathrooms}
-            </p>
-            <p>
-              <span className="item-details-label">Area:</span> {itemData.area}{" "}
-              sq.ft
-            </p>
-            <p>
-              <span className="item-details-label">Furnished:</span>{" "}
-              {itemData.furnished ? "Yes" : "No"}
-            </p>
-          </div>
-        )}
-        <div className="item-description">
-          <p className="item-details-label">Description:</p>
-          <p
-            dangerouslySetInnerHTML={{
-              __html: itemData.description.replace(/\r\n|\n|\r/g, "<br/>"),
-            }}
-          />
-        </div>
       </div>
     </>
   );

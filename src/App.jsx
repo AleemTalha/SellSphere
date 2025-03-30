@@ -28,6 +28,7 @@ const ItemDetails = lazy(() => import("./pages/user/itemsDetail/ItemDetails"));
 const CategoriesSearching = lazy(() =>
   import("./pages/user/CategoriesSearchingPage")
 );
+const Application = lazy(() => import("./pages/user/Block-Application/application"));
 
 function TimeoutFallback() {
   const [timeoutReached, setTimeoutReached] = useState(false);
@@ -65,6 +66,7 @@ function App() {
     <Router>
       <Suspense fallback={<Loading />}>
         <Routes>
+          <Route path="/unblock-account" element={<Application />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/post-ads" element={<PostAd />} />

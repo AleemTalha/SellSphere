@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,6 +10,7 @@ const Contact = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm();
 
   useEffect(() => {
@@ -37,9 +38,27 @@ const Contact = () => {
   };
 
   const onSubmit = async (data) => {
-    showToast("Message sent successfully", true);
-  };
+    try {
+      const API_URI = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URI}/simple/application`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
+      const result = await response.json();
+      if (response.ok) {
+        showToast(result.message, true);
+        reset();
+      } else {
+        showToast(result.message, false);
+      }
+    } catch (error) {
+      showToast("An error occurred. Please try again.", false);
+    }
+  };
 
   return (
     <>
@@ -57,7 +76,7 @@ const Contact = () => {
           </NavLink>
           <NavLink
             to="/faqs"
-           className="btn elong transition-all nav-link text-light text-decoration-none"
+            className="btn elong transition-all nav-link text-light text-decoration-none"
           >
             FAQs
           </NavLink>
@@ -65,18 +84,83 @@ const Contact = () => {
       </nav>
       <div className="contact-container">
         <div className="contact-content">
-          <h1>Contact Us</h1>
-          <p>
-            If you have any questions, concerns, or issues, please feel free to
-            reach out to us. We are here to help you!
-          </p>
+          <div className="contact-form-section">
+            <h1 className="text-center">Submit Application</h1>
+            <p className="text-center">
+              If you have any questions, concerns, or issues, please feel free
+              to reach out to us. We are here to help you!
+            </p>
+            <form onSubmit={handleSubmit(onSubmit)} className="contact-form">
+              <div className="mb-3">
+                <label htmlFor="email" className="form-label fw-semibold">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  className={`form-control rounded-3 ${
+                    errors.email ? "is-invalid" : ""
+                  }`}
+                  id="email"
+                  autoComplete="email"
+                  required
+                  {...register("email", { required: "Email is required" })}
+                />
+                {errors.email && (
+                  <div className="invalid-feedback">{errors.email.message}</div>
+                )}
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="description" className="form-label fw-semibold">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  className={`form-control rounded-3 ${
+                    errors.description ? "is-invalid" : ""
+                  }`}
+                  id="description"
+                  rows="5"
+                  required
+                  {...register("description", {
+                    required: "Description is required",
+                  })}
+                ></textarea>
+                {errors.description && (
+                  <div className="invalid-feedback">
+                    {errors.description.message}
+                  </div>
+                )}
+              </div>
+
+              <button
+                disabled={isSubmitting}
+                className="btn w-100 bg-nav text-light rounded-3 mt-3 fw-semibold"
+                type="submit"
+              >
+                {isSubmitting ? (
+                  <div>
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    <span> Submitting...</span>
+                  </div>
+                ) : (
+                  "Submit Application"
+                )}
+              </button>
+            </form>
+          </div>
           <h2>How to Unblock Your Account</h2>
           <p>
             If your account has been blocked by the admin for any reason, you
             can follow the steps below to unblock your account:
           </p>
           <ul>
-            <li>Contact our support team using the form below.</li>
+            <li>Contact our support team using the form above.</li>
             <li>Provide your account details and the reason for unblocking.</li>
             <li>
               Our support team will review your request and get back to you.
@@ -183,67 +267,6 @@ const Contact = () => {
               and any error messages.
             </li>
           </ul>
-          <h2>Contact Form</h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="contact-form">
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label fw-semibold">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                className={`form-control rounded-3 ${
-                  errors.email ? "is-invalid" : ""
-                }`}
-                id="email"
-                autoComplete="email"
-                required
-                minLength={5}
-                {...register("email", { required: "Email is required" })}
-              />
-              {errors.email && (
-                <div className="invalid-feedback">{errors.email.message}</div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="message" className="form-label fw-semibold">
-                Message
-              </label>
-              <textarea
-                name="message"
-                className={`form-control rounded-3 ${
-                  errors.message ? "is-invalid" : ""
-                }`}
-                id="message"
-                rows="5"
-                required
-                {...register("message", { required: "Message is required" })}
-              ></textarea>
-              {errors.message && (
-                <div className="invalid-feedback">{errors.message.message}</div>
-              )}
-            </div>
-
-            <button
-              disabled={isSubmitting}
-              className="btn w-100 bg-nav text-light rounded-3 mt-3 fw-semibold"
-              type="submit"
-            >
-              {isSubmitting ? (
-                <div>
-                  <span
-                    className="spinner-border spinner-border-sm"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  <span> Sending...</span>
-                </div>
-              ) : (
-                "Send Message"
-              )}
-            </button>
-          </form>
         </div>
       </div>
     </>
