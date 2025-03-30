@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "./card.css";
 import { NavLink } from "react-router-dom";
 import slugify from "slugify";
+import ReportMenu from "../report/report";
 
 const Card = ({ ad }) => {
   const [locationInfo, setLocationInfo] = useState({
@@ -124,15 +125,18 @@ const Card = ({ ad }) => {
         </div>
         <div className="d-flex justify-content-center align-items-center mt-2">
           {isImageLoaded ? (
-            <NavLink
-              type="button"
-              className="rounded transition-all text-decoration-none btn-d-card mt-2 px-3 py-1 bg-transparent text-nav border border-dark border-2"
-              to={`/item-id/${ad._id}/${slugify(ad.category, {
-                lower: true,
-              })}/`}
-            >
-              View Details
-            </NavLink>
+            <>
+              <NavLink
+                type="button"
+                className="rounded transition-all text-decoration-none btn-d-card mt-2 px-3 py-1 bg-transparent text-nav border border-dark border-2"
+                to={`/item-id/${ad._id}/${slugify(ad.category, {
+                  lower: true,
+                })}/`}
+              >
+                View Details
+              </NavLink>
+             
+            </>
           ) : (
             <div
               className="skeleton skeleton-button"

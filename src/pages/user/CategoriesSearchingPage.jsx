@@ -231,9 +231,12 @@ const CategoriesSearchingPage = () => {
         ) : data.length === 0 ? (
           <p>No ads to show</p>
         ) : (
-          <div className="row">
+          <div className="row m-0 p-0 w-100">
             {data.map((ad) => (
-              <div className="col-md-6" key={ad._id}>
+              <div
+                className="col-6 d-flex justify-content-center align-items-center"
+                key={ad._id}
+              >
                 <Card ad={ad} />
               </div>
             ))}
@@ -242,7 +245,7 @@ const CategoriesSearchingPage = () => {
         <div className="text-center my-3">
           {!noMoreAds && data.length > 0 && (
             <button
-              className="btn btn-primary"
+              className="btn bg-nav"
               onClick={handleLoadMore}
               disabled={loading}
             >

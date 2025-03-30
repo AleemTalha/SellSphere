@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./report.css";
 
-const ReportMenu = ({ itemId, title, createdBy, type, postedBy }) => {
+const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
   const showToast = (message, isSuccess) => {
     const options = {
       position: "top-right",
@@ -18,16 +19,11 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy }) => {
     isSuccess ? toast.success(message, options) : toast.error(message, options);
   };
 
-  const [showMenu, setShowMenu] = useState(false);
   const [showReportForm, setShowReportForm] = useState(false);
   const [issue, setIssue] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState(""); // State to store form error messages
-
-  const menuRef = useRef(null);
-  const formRef = useRef(null);
-  const containerRef = useRef(null);
+  const [formError, setFormError] = useState("");
 
   // **Disable Scroll Bar Visibility on Report Form Open**
   useEffect(() => {
@@ -42,39 +38,12 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy }) => {
     };
   }, [showReportForm]);
 
-  // **Toggle Report Menu**
-  const toggleMenu = () => setShowMenu(!showMenu);
-
-  // **Open Report Form**
-  const openReportForm = () => {
-    setShowMenu(false);
-    setShowReportForm(true);
-  };
-
-  // **Close menu/form if clicked outside**
-  const handleClickOutside = (e) => {
-    if (
-      containerRef.current &&
-      !containerRef.current.contains(e.target) &&
-      !menuRef.current?.contains(e.target) &&
-      !formRef.current?.contains(e.target)
-    ) {
-      setShowMenu(false);
-      setShowReportForm(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const submitReport = async () => {
     if (!issue) {
       setFormError("Please select an issue before submitting.");
       return;
     }
-    setFormError(""); // Clear any previous error messages
+    setFormError("");
     setLoading(true);
 
     try {
@@ -108,7 +77,7 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy }) => {
           return;
         }
         if (response.status === 429) {
-          setShowReportForm(false); // Close the report form
+          setShowReportForm(false);
           showToast("Too many reportings, please try again later.", false);
           return;
         }
@@ -117,19 +86,15 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy }) => {
         try {
           const errorData = await response.json();
           errorMessage = errorData?.message || errorMessage;
-        } catch {
-          // Handle non-JSON error responses
-        }
+        } catch {}
+
         throw new Error(errorMessage);
       }
 
-      const data = await response.json();
       showToast("Report submitted successfully!", true);
       setShowReportForm(false);
     } catch (error) {
-      setFormError(
-        error.message || "An error occurred while submitting the report."
-      );
+      setFormError(error.message || "An error occurred while submitting the report.");
     } finally {
       setLoading(false);
     }
@@ -137,116 +102,50 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy }) => {
 
   return (
     <>
-        
-      {showReportForm && <div className="blur-background"></div>}
-      <div className="report-container" ref={containerRef}>
-        <div className="report-btn-container">
-          <button
-            className="menu-button bg-nav"
-            onClick={toggleMenu}
-            ref={menuRef}
-          >
-            Report
-          </button>
-          {showMenu && (
-            <div className="menu-dropdown">
-              <button className="menu-option" onClick={openReportForm}>
-                <i className="bi bi-flag"></i> Report
-              </button>
-            </div>
-          )}
-        </div>
-        {showReportForm && (
-          <div className="report-popup" ref={formRef}>
-            <h3>Report Item</h3>
-            <label>Select issue:</label>
-            <div className="radio-group">
-              <label>
-                <input
-                  type="radio"
-                  value="Scam"
-                  checked={issue === "Scam"}
-                  onChange={(e) => setIssue(e.target.value)}
-                />
-                Scam
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="Fraud"
-                  checked={issue === "Fraud"}
-                  onChange={(e) => setIssue(e.target.value)}
-                />
-                Fraud
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="False Seller"
-                  checked={issue === "False Seller"}
-                  onChange={(e) => setIssue(e.target.value)}
-                />
-                False Seller
-              </label>
-              <h4>Content Issues</h4>
-              <label>
-                <input
-                  type="radio"
-                  value="Sexual Content"
-                  checked={issue === "Sexual Content"}
-                  onChange={(e) => setIssue(e.target.value)}
-                />
-                Sexual Content
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="Misleading"
-                  checked={issue === "Misleading"}
-                  onChange={(e) => setIssue(e.target.value)}
-                />
-                Misleading Information
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="False Information"
-                  checked={issue === "False Information"}
-                  onChange={(e) => setIssue(e.target.value)}
-                />
-                False Information
-              </label>
-            </div>
-            <label>Description (optional):</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide more details..."
-            />
-            {formError && <p className="form-error">{formError}</p>}{" "}
-            {/* Display form error */}
-            <div className="popup-buttons">
-              <button
-                className="bg-nav"
-                onClick={() => setShowReportForm(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-nav"
-                onClick={submitReport}
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="spinner-border spinner-border-sm"></span>
-                ) : (
-                  "Submit"
+      <button className="menu-button bg-nav" onClick={() => setShowReportForm(true)}>
+        {text ? text : "report"}
+      </button>
+
+      {showReportForm &&
+        createPortal(
+          <div className="report-popup-overlay">
+            <div className="report-popup">
+              <h3>Report Item</h3>
+              <label>Select issue:</label>
+              <div className="radio-group">
+                {["Scam", "Fraud", "False Seller", "Sexual Content", "Misleading", "False Information"].map(
+                  (item) => (
+                    <label key={item}>
+                      <input
+                        type="radio"
+                        value={item}
+                        checked={issue === item}
+                        onChange={(e) => setIssue(e.target.value)}
+                      />
+                      {item}
+                    </label>
+                  )
                 )}
-              </button>
+              </div>
+              <label>Description (optional):</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Provide more details..."
+              />
+              {formError && <p className="form-error">{formError}</p>}
+              <div className="popup-buttons">
+                <button className="bg-nav text-light" onClick={() => setShowReportForm(false)}>
+                  Cancel
+                </button>
+                <button className="bg-nav" onClick={submitReport} disabled={loading}>
+                  {loading ? <span className="spinner-border spinner-border-sm"></span> : "Submit"}
+                </button>
+              </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
-      </div>
     </>
   );
 };

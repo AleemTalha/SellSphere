@@ -113,6 +113,7 @@ const ItemDetails = () => {
               <span className="item-details-label">Contact:</span>{" "}
               {itemData.showNumber ? itemData.contactNumber : "Hidden"}
             </p>
+            <div className="d-flex justify-content-end align-items-center p-2 rounded">
             <ReportMenu
               itemId={id}
               title={itemData.title}
@@ -120,6 +121,7 @@ const ItemDetails = () => {
               type={itemData.category}
               postedBy={itemData.postedBy}
             />
+            </div>
           </div>
         </div>
         {itemData.category === "Cars" && (
