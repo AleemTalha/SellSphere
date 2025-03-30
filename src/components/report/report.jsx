@@ -24,6 +24,7 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
+  const reportFormRef = useRef(null);
 
   // **Disable Scroll Bar Visibility on Report Form Open**
   useEffect(() => {
@@ -35,6 +36,26 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
 
     return () => {
       document.body.classList.remove("report-form-open");
+    };
+  }, [showReportForm]);
+
+  // Close the form if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        reportFormRef.current &&
+        !reportFormRef.current.contains(event.target)
+      ) {
+        setShowReportForm(false);
+      }
+    };
+
+    if (showReportForm) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showReportForm]);
 
@@ -94,7 +115,9 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
       showToast("Report submitted successfully!", true);
       setShowReportForm(false);
     } catch (error) {
-      setFormError(error.message || "An error occurred while submitting the report.");
+      setFormError(
+        error.message || "An error occurred while submitting the report."
+      );
     } finally {
       setLoading(false);
     }
@@ -102,30 +125,38 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
 
   return (
     <>
-      <button className="menu-button bg-nav" onClick={() => setShowReportForm(true)}>
+      <button
+        className="menu-button bg-nav"
+        onClick={() => setShowReportForm(true)}
+      >
         {text ? text : "report"}
       </button>
 
       {showReportForm &&
         createPortal(
           <div className="report-popup-overlay">
-            <div className="report-popup">
+            <div className="report-popup" ref={reportFormRef}>
               <h3>Report Item</h3>
               <label>Select issue:</label>
               <div className="radio-group">
-                {["Scam", "Fraud", "False Seller", "Sexual Content", "Misleading", "False Information"].map(
-                  (item) => (
-                    <label key={item}>
-                      <input
-                        type="radio"
-                        value={item}
-                        checked={issue === item}
-                        onChange={(e) => setIssue(e.target.value)}
-                      />
-                      {item}
-                    </label>
-                  )
-                )}
+                {[
+                  "Scam",
+                  "Fraud",
+                  "False Seller",
+                  "Sexual Content",
+                  "Misleading",
+                  "False Information",
+                ].map((item) => (
+                  <label key={item}>
+                    <input
+                      type="radio"
+                      value={item}
+                      checked={issue === item}
+                      onChange={(e) => setIssue(e.target.value)}
+                    />
+                    {item}
+                  </label>
+                ))}
               </div>
               <label>Description (optional):</label>
               <textarea
@@ -135,11 +166,22 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
               />
               {formError && <p className="form-error">{formError}</p>}
               <div className="popup-buttons">
-                <button className="bg-nav text-light" onClick={() => setShowReportForm(false)}>
+                <button
+                  className="bg-nav text-light"
+                  onClick={() => setShowReportForm(false)}
+                >
                   Cancel
                 </button>
-                <button className="bg-nav" onClick={submitReport} disabled={loading}>
-                  {loading ? <span className="spinner-border spinner-border-sm"></span> : "Submit"}
+                <button
+                  className="bg-nav"
+                  onClick={submitReport}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <span className="spinner-border spinner-border-sm"></span>
+                  ) : (
+                    "Submit"
+                  )}
                 </button>
               </div>
             </div>

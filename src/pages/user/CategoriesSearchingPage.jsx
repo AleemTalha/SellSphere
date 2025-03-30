@@ -61,18 +61,19 @@ const CategoriesSearchingPage = () => {
   }, [category, subcategory]);
 
   useEffect(() => {
-    if (category) {
-      const categoryData = categoriesData.find(
-        (cat) => cat.category.toLowerCase() === category.toLowerCase()
-      );
-      setSubcategories(categoryData ? categoryData.items : []);
-      if (subcategory) {
-        setSelectedSubcategory(unslugify(subcategory));
-      } else {
-        setSelectedSubcategory("");
-      }
+    const formattedCategory = unslugify(category);
+    console.log("Formatted Category:", formattedCategory);
+    const matchedCategory = categoriesData.find(
+      (cat) => cat.category.toLowerCase() === formattedCategory.toLowerCase()
+    );
+    console.log("Matched Category:", matchedCategory);
+
+    if (matchedCategory) {
+      setSubcategories(matchedCategory.items);
+      setSelectedSubcategory(subcategory ? unslugify(subcategory) : "");
     } else {
       setSubcategories([]);
+      setSelectedSubcategory("");
     }
   }, [category, subcategory]);
 
@@ -158,6 +159,14 @@ const CategoriesSearchingPage = () => {
   };
 
   const applyFilters = () => {
+    if (
+      tempFilters.startPrice &&
+      tempFilters.lastPrice &&
+      Number(tempFilters.lastPrice) < Number(tempFilters.startPrice)
+    ) {
+      showToast("Last price cannot be less than start price!", false);
+      return;
+    }
     setFilters({
       ...tempFilters,
       subcategory: selectedSubcategory,
@@ -190,9 +199,20 @@ const CategoriesSearchingPage = () => {
           style={{ maxWidth: "200px", flex: "1 1 auto" }}
           placeholder="Start Price"
           value={tempFilters.startPrice}
-          onChange={(e) =>
-            setTempFilters({ ...tempFilters, startPrice: e.target.value })
-          }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (
+              tempFilters.lastPrice &&
+              Number(value) > Number(tempFilters.lastPrice)
+            ) {
+              showToast(
+                "Start price cannot be greater than last price!",
+                false
+              );
+              return;
+            }
+            setTempFilters({ ...tempFilters, startPrice: value });
+          }}
         />
         <input
           type="number"
@@ -200,9 +220,17 @@ const CategoriesSearchingPage = () => {
           style={{ maxWidth: "200px", flex: "1 1 auto" }}
           placeholder="Last Price"
           value={tempFilters.lastPrice}
-          onChange={(e) =>
-            setTempFilters({ ...tempFilters, lastPrice: e.target.value })
-          }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (
+              tempFilters.startPrice &&
+              Number(value) < Number(tempFilters.startPrice)
+            ) {
+              showToast("Last price cannot be less than start price!", false);
+              return;
+            }
+            setTempFilters({ ...tempFilters, lastPrice: value });
+          }}
         />
         <button
           className="btn btn-primary"
@@ -245,11 +273,22 @@ const CategoriesSearchingPage = () => {
         <div className="text-center my-3">
           {!noMoreAds && data.length > 0 && (
             <button
-              className="btn bg-nav"
+              className="btn bg-nav text-light"
               onClick={handleLoadMore}
               disabled={loading}
             >
-              {loading ? "Loading..." : "Load More"}
+              {loading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Loading...
+                </>
+              ) : (
+                "Load More"
+              )}
             </button>
           )}
           {noMoreAds && data.length > 0 && (
