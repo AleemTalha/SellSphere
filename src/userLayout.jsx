@@ -1,17 +1,21 @@
-import React, { Suspense, lazy } from "react";
-import { Routes, Route, Outlet, Navigate } from "react-router-dom";
-import Dashboard from "./pages/user/dashboard/dashboard";
+import React, { Suspense, lazy, useEffect, useState } from "react";
+import { Routes, Route, Outlet, Navigate, useLocation } from "react-router-dom";
 import Loading from "./components/loading";
-import Forbidden from "./pages/error/Forbidden";
+import ContactButton from "./components/ContactButton/ContactButton";
 
+const Dashboard = lazy(() => import("./pages/user/dashboard/Dashboard"));
+const Forbidden = lazy(() => import("./pages/error/Forbidden"));
 const PostAd = lazy(() => import("./pages/user/postAd/postAd"));
 const ForgotEmail = lazy(() => import("./pages/user/forgotPassword/forgot"));
 const Policy = lazy(() => import("./pages/user/policy/Policy"));
 const Contact = lazy(() => import("./pages/user/contact/Contact"));
 const FAQs = lazy(() => import("./pages/user/FAQs/faq"));
 const Profile = lazy(() => import("./pages/user/profile/Profile"));
-const About = lazy(() => import("./pages/About/About"));
+const About = lazy(() => import("./pages/user/About/About"));
 const ItemDetails = lazy(() => import("./pages/user/itemsDetail/ItemDetails"));
+const Unblocked = lazy(() =>
+  import("./pages/user/Block-Application/application")
+);
 const CategoriesSearching = lazy(() =>
   import("./pages/user/CategoriesSearchingPage")
 );
@@ -40,9 +44,23 @@ const decodeJWT = (token) => {
 };
 
 const userLayout = () => {
-  const token = getCookie("token");
-  const decodedToken = token ? decodeJWT(token) : null;
-  const userRole = decodedToken?.role;
+  const [token, setToken] = useState(getCookie("token"));
+  const [userRole, setUserRole] = useState(
+    token ? decodeJWT(token)?.role : null
+  );
+  const location = useLocation();
+
+  useEffect(() => {
+    const updateToken = () => {
+      const newToken = getCookie("token");
+      if (newToken !== token) {
+        setToken(newToken);
+        setUserRole(newToken ? decodeJWT(newToken)?.role : null);
+      }
+    };
+
+    updateToken();
+  }, [location]);
 
   const isUser = token && userRole === "user";
   const isAdmin = token && userRole === "admin";
@@ -50,6 +68,7 @@ const userLayout = () => {
   return (
     <div>
       <Suspense fallback={<Loading />}>
+        <ContactButton />
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route
@@ -104,21 +123,23 @@ const userLayout = () => {
             path="/forgot-password"
             element={!token ? <ForgotEmail /> : <Forbidden role={userRole} />}
           />
-          <Route
-            path="/policy"
-            element={!token ? <Policy /> : <Forbidden role={userRole} />}
-          />
+          <Route path="/policy" element={<Policy />} />
           <Route
             path="/faqs"
             element={!token ? <FAQs /> : <Forbidden role={userRole} />}
           />
-          <Route
-            path="/about"
-            element={!token ? <About /> : <Forbidden role={userRole} />}
-          />
+          <Route path="/about" element={<About />} />
           <Route
             path="/contact"
-            element={!token ? <Contact /> : <Forbidden role={userRole} />}
+            element={
+              !token || isUser ? <Contact /> : <Forbidden role={userRole} />
+            }
+          />
+          <Route
+            path="/unblock-account"
+            element={
+              !token || isUser ? <Unblocked /> : <Forbidden role={userRole} />
+            }
           />
           <Route path="*" element={<ErrorPage />} />
         </Routes>

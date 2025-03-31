@@ -1,9 +1,9 @@
 import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Loading from "./components/loading";
-import Forbidden from "./pages/error/Forbidden";
 import { getCookie, decodeJWT } from "./utils/auth";
 
+import Forbidden from "./pages/error/Forbidden";
 const AdminDashboard = lazy(() => import("./pages/admin/dashboard"));
 const ErrorPage = lazy(() => import("./pages/error/ErrorPage"));
 

@@ -8,7 +8,7 @@
 }
 
 .nav-link {
-  color: #ffffff !important;
+  color: #ffffff;
   font-weight: 500;
   position: relative;
   overflow: hidden;
@@ -31,7 +31,7 @@
 }
 
 .nav-link:hover {
-  color: #ffcc00 !important; /* Updated color */
+  color: #ffcc00;
   transform: scale(1.1);
 }
 

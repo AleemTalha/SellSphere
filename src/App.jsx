@@ -10,8 +10,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
-import ContactButton from "./components/ContactButton/ContactButton";
 import UserLayout from "./userLayout";
+import ScrollToTop from "./utils/scroll";
 import AdminLayout from "./adminLayout";
 import { getCookie, decodeJWT } from "./utils/auth";
 
@@ -27,6 +27,7 @@ function App() {
   return (
     <Router>
       <Suspense fallback={<Loading />}>
+          <ScrollToTop />
         <Routes>
           <Route
             path="/login"
@@ -49,7 +50,6 @@ function App() {
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </Suspense>
-      <ContactButton />
     </Router>
   );
 }

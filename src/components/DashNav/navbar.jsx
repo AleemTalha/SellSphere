@@ -177,7 +177,8 @@ const Navbar = ({ user, setLocation }) => {
                           to={`/category/${slugify(
                             categoryData.category
                           )}/${slugify(item)}`}
-                          className="text-decoration-none category-items elong btn p-0 transition-all"
+                          type="button"
+                          className="text-decoration-none category-items elong p-0 transition-all"
                           onClick={() => setIsOpen(false)}
                         >
                           {item}
@@ -191,7 +192,7 @@ const Navbar = ({ user, setLocation }) => {
           </div>
         </div>
 
-        <div className="location-info">
+        <div className="location-info" style={{minHeight: "20px", maxHeight:"20px"}}>
           {isMobile ? (
             <div className="cursor-pointer position-relative location-icon-container">
               <i

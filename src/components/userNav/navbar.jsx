@@ -33,10 +33,15 @@ const showToastMessage = (success, message) => {
 const Navbar = ({ user, setUser }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleImageLoad = () => {
     setImageLoaded(true);
+  };
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
   };
 
   const handleLogout = async () => {
@@ -71,48 +76,54 @@ const Navbar = ({ user, setUser }) => {
         </NavLink>
         <div className="nav-links">
           {user ? (
-           <div className="user-menu">
-           <div className="user-info">
-             {!imageLoaded && <div className="user-skeleton-loader"></div>}
-             <img
-               src={user.profileImage?.url || "/images/default.png"}
-               alt="Profile"
-               className={`user-image ${!imageLoaded ? "d-none" : ""}`}
-               onLoad={handleImageLoad}
-             />
-             <span className="user-user-name">{user.fullName}</span>
-           </div>
-           <div className="user-dropdown-content">
-             <NavLink
-               to={`/profile/${user._id}`}
-               state={{ userId: user._id }}
-               className="user-dropdown-link nav-link text-black text-decoration-none"
-             >
-               Profile
-             </NavLink>
-             <button
-               onClick={handleLogout}
-               className="user-dropdown-link nav-link text-black text-decoration-none"
-               disabled={isLoggingOut}
-             >
-               {isLoggingOut ? (
-                 <>
-                   <div
-                     className="spinner-border spinner-border-sm"
-                     role="status"
-                     style={{ color: "#ffcc00" }}
-                   >
-                     <span className="visually-hidden">Loading...</span>
-                   </div>
-                   Logging out...
-                 </>
-               ) : (
-                 "Logout"
-               )}
-             </button>
-           </div>
-         </div>
-         
+            <div
+              className={`user-menu ${dropdownOpen ? "open" : ""}`}
+              onMouseEnter={() => setDropdownOpen(true)}
+              onMouseLeave={() => setDropdownOpen(false)}
+            >
+              <div className="user-info" onClick={toggleDropdown}>
+                {!imageLoaded && <div className="user-skeleton-loader"></div>}
+                <span className="user-user-name">{user.fullname}</span>
+                <img
+                  src={user.profileImage?.url || "/images/default.png"}
+                  alt="Profile"
+                  className={`user-image ${!imageLoaded ? "d-none" : ""}`}
+                  onLoad={handleImageLoad}
+                />
+              </div>
+              {dropdownOpen && (
+                <div className="user-dropdown-content">
+                  <NavLink
+                  type="button"
+                    to={`/profile/${user._id}`}
+                    state={{ userId: user._id }}
+                    className="btn text-dark user-dropdown-link text-black text-decoration-none"
+                  >
+                    Profile
+                  </NavLink>
+                  <button
+                    onClick={handleLogout}
+                    className="btn text-dark user-dropdown-link text-black text-decoration-none"
+                    disabled={isLoggingOut}
+                  >
+                    {isLoggingOut ? (
+                      <>
+                        <div
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          style={{ color: "#ffcc00" }}
+                        >
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                        Logging out...
+                      </>
+                    ) : (
+                      "Logout"
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="auth-links d-flex">
               <NavLink

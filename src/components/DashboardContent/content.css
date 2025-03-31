@@ -201,7 +201,7 @@
 .btn-primary {
   background-color: var(--bg-nav) !important;
   border: 2px solid white !important;
-  color: white !important;
+  /* color: white !important; */
 }
 
 .btn-primary:hover {

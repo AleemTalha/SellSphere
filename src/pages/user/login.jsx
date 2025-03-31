@@ -772,7 +772,9 @@ const login = () => {
             </NavLink>
           </p>
           <div className="mb-4">
-            <NavLink className="text-decoration-none bg-nav btn">
+            <NavLink className="text-decoration-none bg-nav btn"
+            to="/unblock-account"
+            >
               <span className="text-light fw-bold">Unblock Application</span>
             </NavLink>
           </div>

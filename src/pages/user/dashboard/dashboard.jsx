@@ -238,12 +238,9 @@ const Dashboard = () => {
           </span>
         </div>
       )}
+      <DashboardContent user={user} setUser={setUser} />
 
-      {loading ? (
-        <Loading />
-      ) : (
-        <DashboardContent user={user} setUser={setUser} />
-      )}
+      {loading ? <Loading /> : <></>}
 
       <div
         className="data-section"

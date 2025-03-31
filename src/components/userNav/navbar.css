@@ -20,53 +20,86 @@
 .user-menu {
   position: relative;
   display: inline-block;
-}
-
-.user-image {
-  width: 50px !important;
-  height: 50px !important;
-  border-radius: 50% !important;
-  cursor: pointer !important;
-  border: 2px solid var(--text-btn);
-}
-
-.user-dropdown-content {
-  display: none;
-  position: absolute;
-  right: 0;
-  background-color: #fff;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.user-menu:hover .user-dropdown-content {
-  display: block;
-}
-
-.user-dropdown-content .user-user-name {
-  padding: 12px 16px;
-  font-weight: bold;
-  background-color: var(--bg-nav);
-  color: white;
-}
-
-.user-dropdown-content .user-dropdown-link {
-  color: #000 !important;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  text-align: left;
-  background: none;
-  width: 100%;
-  border: none;
   cursor: pointer;
 }
 
-.user-dropdown-content .user-dropdown-link:hover {
-  background-color: #f1f1f1;
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.user-info:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.user-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  transition: border-color 0.3s ease;
+}
+
+.user-image:hover {
+  border-color: #007bff;
+}
+
+.user-user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.user-dropdown-content {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 150px;
+  padding: 10px 0;
+  display: none;
+}
+
+.user-menu.open .user-dropdown-content {
+  display: block;
+}
+
+.user-dropdown-link {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  text-align: center;
+}
+
+.user-dropdown-link:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.user-dropdown-link.btn {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.user-dropdown-link.btn:hover {
+  background-color: var(--bg-nav);
+  color: #fff;
 }
 
 .user-skeleton-loader {
@@ -196,5 +229,11 @@
 
   .auth-links .btn {
     margin: 5px 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .user-user-name {
+    display: none;
   }
 }

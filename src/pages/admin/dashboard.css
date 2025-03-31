@@ -1,70 +1,96 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
-}
-
-.dashboard-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.dashboard-header {
-  background-color: #4caf50;
-  color: white;
-  padding: 1rem;
-  text-align: center;
-}
-
-.dashboard-content {
-  display: flex;
-  flex: 1;
-}
-
-.dashboard-sidebar {
-  width: 250px;
-  background-color: #333;
-  color: white;
-  padding: 1rem;
-}
-
-.dashboard-sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.dashboard-sidebar li {
-  margin: 1rem 0;
+.admin-dropdown {
+  position: relative;
+  display: inline-block;
   cursor: pointer;
 }
 
-.dashboard-sidebar li:hover {
-  color: #4caf50;
-}
-
-.dashboard-main {
-  flex: 1;
-  padding: 2rem;
-  background-color: white;
-}
-
-.dashboard-main h2 {
-  margin-top: 0;
-}
-
-.dashboard-stats {
+.admin-trigger {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background 0.3s;
 }
 
-.stat-card {
-  flex: 1;
-  padding: 1rem;
-  background-color: #f0f0f0;
+.admin-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  transition: border-color 0.3s ease;
+}
+
+.admin-avatar:hover {
+  border-color: #007bff;
+}
+
+.admin-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.admin-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 150px !important;
+  max-width: 200px !important;
+  padding: 10px 0;
+  display: none;
+}
+
+.admin-dropdown.open .admin-menu {
+  display: block;
+}
+
+.text-dark
+{
+  color: black !important;
+}
+
+.admin-item {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
   text-align: center;
-  font-size: 1.2rem;
+}
+
+.admin-item:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.admin-item.a-btn {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.admin-item.a-btn:hover {
+  background-color: var(--bg-nav);
+  color: #fff;
+}
+
+@media (max-width: 400px) {
+  .admin-name {
+    display: none;
+  }
 }

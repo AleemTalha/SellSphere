@@ -1,7 +1,7 @@
 import React from "react";
-import Navbar from "../../components/userNav/navbar";
+import Navbar from "../../../components/userNav/navbar";
 import { NavLink } from "react-router-dom";
-import Footer from "../../components/Footer/Footer";
+import Footer from "../../../components/Footer/Footer";
 import "./About.css";
 
 const About = () => {
