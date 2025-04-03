@@ -62,30 +62,6 @@ const login = () => {
   } = useForm();
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const API_URL = import.meta.env.VITE_API_URL;
-        const response = await fetch(`${API_URL}/auth/check-login`, {
-          method: "GET",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
-
-        const data = await response.json();
-        if (!data.success) {
-          navigate("/");
-        } else {
-          setLoading(false);
-        }
-      } catch (error) {
-        setLoading(false);
-      }
-    };
-
-    checkLoginStatus();
-  }, []);
-
-  useEffect(() => {
     if (isLogin === "otp" && timer > 0) {
       const interval = setInterval(() => {
         setTimer((prev) => prev - 1);
@@ -108,6 +84,16 @@ const login = () => {
     } else if (isLogin === "password") {
       API_URL = API_URL + "/register/credentials";
     }
+    if (isLogin === "login" || isLogin === "password") {
+      try {
+        const response = await fetch("https://api64.ipify.org?format=json");
+        const ipData = await response.json();
+        data.ipAddress = ipData.ip;
+      } catch (error) {
+        console.error("Error fetching IP:", error);
+      }
+    }
+
     const response = await fetch(`${API_URL}`, {
       method: "POST",
       mode: "cors",
@@ -118,8 +104,10 @@ const login = () => {
       },
       body: JSON.stringify(data),
     });
+
     const responseData = await response.json();
     reset();
+
     if (responseData.success) {
       if (isLogin === "register") {
         setIsLogin("otp");
@@ -128,7 +116,6 @@ const login = () => {
       } else if (isLogin === "password") {
         setIsLogin("login");
       } else if (isLogin === "login") {
-        // console.log(responseData);
         if (responseData.role === "user") {
           navigate("/");
         } else if (responseData.role === "admin") {
@@ -136,10 +123,11 @@ const login = () => {
         }
       }
       showToast(responseData.message, true);
-    } else if (!responseData.success) {
+    } else {
       showToast(responseData.message, false);
     }
   };
+
   const resendOTP = async () => {
     setTimer(60);
     setCanResend(false);
@@ -772,8 +760,9 @@ const login = () => {
             </NavLink>
           </p>
           <div className="mb-4">
-            <NavLink className="text-decoration-none bg-nav btn"
-            to="/unblock-account"
+            <NavLink
+              className="text-decoration-none bg-nav btn"
+              to="/unblock-account"
             >
               <span className="text-light fw-bold">Unblock Application</span>
             </NavLink>

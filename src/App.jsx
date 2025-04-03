@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import "aos/dist/aos.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -17,18 +18,20 @@ import { getCookie, decodeJWT } from "./utils/auth";
 
 const Login = lazy(() => import("./pages/user/login"));
 const ErrorPage = lazy(() => import("./pages/error/ErrorPage"));
+const ForbiddenPage = lazy(() => import("./pages/error/Forbidden"));
 import Loading from "./components/loading";
 
 function App() {
-  const token = getCookie("token");
-  const decodedToken = token ? decodeJWT(token) : null;
-  const userRole = decodedToken?.role;
+  const [userRole, setUserRole] = useState(null);
+  const [token, setToken] = useState(null);
 
   return (
     <Router>
       <Suspense fallback={<Loading />}>
-          <ScrollToTop />
+        <ScrollToTop />
+        <RouteHandler setToken={setToken} setUserRole={setUserRole} />
         <Routes>
+          <Route path="/*" element={<UserLayout />} />
           <Route
             path="/login"
             element={
@@ -46,12 +49,24 @@ function App() {
             }
           />
           <Route path="/admin/*" element={<AdminLayout />} />
-          <Route path="/*" element={<UserLayout />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </Suspense>
     </Router>
   );
+}
+
+function RouteHandler({ setToken, setUserRole }) {
+  const location = useLocation();
+
+  useEffect(() => {
+    const currentToken = getCookie("token");
+    setToken(currentToken);
+    const decodedToken = currentToken ? decodeJWT(currentToken) : null;
+    setUserRole(decodedToken?.role);
+  }, [location]);
+
+  return null;
 }
 
 export default App;

@@ -82,8 +82,8 @@ const Navbar = ({ user, setUser }) => {
               onMouseLeave={() => setDropdownOpen(false)}
             >
               <div className="user-info" onClick={toggleDropdown}>
-                {!imageLoaded && <div className="user-skeleton-loader"></div>}
                 <span className="user-user-name">{user.fullname}</span>
+                {!imageLoaded && <div className="user-skeleton-loader"></div>}
                 <img
                   src={user.profileImage?.url || "/images/default.png"}
                   alt="Profile"

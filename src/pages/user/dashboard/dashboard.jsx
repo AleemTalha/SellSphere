@@ -47,7 +47,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const API_URI = import.meta.env.VITE_API_URI || "http://localhost:3000";
+        const API_URI = import.meta.env.VITE_API_URL || "http://localhost:3000";
         const response = await fetch(`${API_URI}/dashboard`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -81,10 +81,10 @@ const Dashboard = () => {
           const { latitude, longitude } = JSON.parse(storedLocation);
           setLatitude(latitude);
           setLongitude(longitude);
-          // console.log("Location fetched from localStorage:", {
-          // latitude,
-          // longitude,
-          // });
+          console.log("Location fetched from localStorage:", {
+          latitude,
+          longitude,
+          });
           return { latitude, longitude };
         } else {
           // console.error("No location found in localStorage.");
@@ -98,7 +98,7 @@ const Dashboard = () => {
       // throw new Error("Invalid location data");
       // }
 
-      const API_URI = import.meta.env.VITE_API_URI || "http://localhost:3000";
+      const API_URI = import.meta.env.VITE_API_URL || "http://localhost:3000";
       const apiUrl = `${API_URI}/dashboard/api`;
       const options = {
         method: "POST",
@@ -138,7 +138,7 @@ const Dashboard = () => {
       }
     } catch (error) {
       // showToast(error.message || "Error fetching dashboard data", false);
-      const API_URI = import.meta.env.VITE_API_URI || "http://localhost:3000";
+      const API_URI = import.meta.env.VITE_API_URL || "http://localhost:3000";
       const response2 = await fetch(`${API_URI}/dashboard/sample/api`, {
         credentials: "include",
         method: "GET",

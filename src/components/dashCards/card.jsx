@@ -58,7 +58,8 @@ const Card = ({ ad }) => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsImageVisible(true);
+          setIsImageVisible(true); // Set image visibility when the card enters the viewport
+          observer.disconnect(); // Disconnect observer after the image is set to load
         }
       },
       { threshold: 0.1 }
@@ -81,11 +82,15 @@ const Card = ({ ad }) => {
         {!isImageLoaded && <div className="skeleton skeleton-image"></div>}
         {isImageVisible && (
           <img
-            src={ad.image.url}
+            src={`${ad.image.url}?w=300&h=300&fit=cover&auto=format&f_auto&q_auto:low&dpr=2`}
             alt={ad.title}
             className="d-card-image"
             onLoad={() => setIsImageLoaded(true)}
-            style={{ display: isImageLoaded ? "block" : "none" }}
+            style={{
+              display: isImageLoaded ? "block" : "none",
+              filter: isImageLoaded ? "none" : "blur(10px)",
+              transition: "filter 0.2s ease-in-out",
+            }}
           />
         )}
       </div>
@@ -135,7 +140,6 @@ const Card = ({ ad }) => {
               >
                 View Details
               </NavLink>
-             
             </>
           ) : (
             <div

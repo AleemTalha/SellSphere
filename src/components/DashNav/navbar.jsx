@@ -16,6 +16,8 @@ const Navbar = ({ user, setLocation }) => {
   const [country, setCountry] = useState("");
   const [showLocation, setShowLocation] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [locationFetched, setLocationFetched] = useState(false); // Track if location is fetched
+  const [retryingLocation, setRetryingLocation] = useState(false); // Track if retry is in progress
   const menuRef = useRef(null);
   const showToast = (success, message) => {
     if (success) {
@@ -47,10 +49,10 @@ const Navbar = ({ user, setLocation }) => {
     const fetchCityAndCountry = async (latitude, longitude) => {
       try {
         const response = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          `https://api.bigdatacloud.net/data/reverse-geocode?latitude=${latitude}&longitude=${longitude}&localityLanguage=en&key=${import.meta.env.VITE_GEO_API}`
         );
         const data = await response.json();
-
+        console.log("Location used here")
         setCity(data.city || data.locality || "");
         setCountry(data.countryName || "");
       } catch (error) {
@@ -75,9 +77,9 @@ const Navbar = ({ user, setLocation }) => {
           (position) => {
             const { latitude, longitude } = position.coords;
             updateLocation(latitude, longitude);
+            setLocationFetched(true); // Mark location as fetched
           },
           (error) => {
-            // showToast(false, "Error getting location: ");
             if (error.code === error.PERMISSION_DENIED) {
               showToast(
                 "Permission denied. Please allow location access.",
@@ -86,6 +88,7 @@ const Navbar = ({ user, setLocation }) => {
             }
             setCity("");
             setCountry("");
+            setLocationFetched(true); // Mark location as fetched even if failed
           }
         );
       } else {
@@ -93,25 +96,30 @@ const Navbar = ({ user, setLocation }) => {
         showToast("Geolocation is not supported by your browser.", false);
         setCity("No location");
         setCountry("");
+        setLocationFetched(true); // Mark location as fetched even if failed
       }
     };
 
-    const storedLocation = JSON.parse(localStorage.getItem("userLocation"));
+    if (!locationFetched) {
+      const storedLocation = JSON.parse(localStorage.getItem("userLocation"));
 
-    if (storedLocation) {
-      const { latitude, longitude } = storedLocation;
-      fetchCityAndCountry(latitude, longitude);
-    } else if (user?.location?.coordinates?.length > 0) {
-      const [longitude, latitude] = user.location.coordinates;
-      updateLocation(latitude, longitude);
-    } else {
-      getLocationFromBrowser();
+      if (storedLocation) {
+        const { latitude, longitude } = storedLocation;
+        fetchCityAndCountry(latitude, longitude);
+        setLocationFetched(true); // Mark location as fetched
+      } else if (user?.location?.coordinates?.length > 0) {
+        const [longitude, latitude] = user.location.coordinates;
+        updateLocation(latitude, longitude);
+        setLocationFetched(true); // Mark location as fetched
+      } else {
+        getLocationFromBrowser();
+      }
     }
 
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [user, setLocation]);
+  }, [user, setLocation, locationFetched]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -127,9 +135,13 @@ const Navbar = ({ user, setLocation }) => {
   }, []);
 
   const retryLocation = () => {
-    setCity("Fetching location...");
-    setCountry("");
-    getLocationFromBrowser();
+    if (!retryingLocation) {
+      setRetryingLocation(true); // Prevent multiple retries
+      setCity("Fetching location...");
+      setCountry("");
+      getLocationFromBrowser();
+      setTimeout(() => setRetryingLocation(false), 3000); // Allow retry after 3 seconds
+    }
   };
 
   return (
@@ -192,7 +204,10 @@ const Navbar = ({ user, setLocation }) => {
           </div>
         </div>
 
-        <div className="location-info" style={{minHeight: "20px", maxHeight:"20px"}}>
+        <div
+          className="location-info"
+          style={{ minHeight: "20px", maxHeight: "20px" }}
+        >
           {isMobile ? (
             <div className="cursor-pointer position-relative location-icon-container">
               <i

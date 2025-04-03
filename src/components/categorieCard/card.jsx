@@ -77,22 +77,55 @@ const Card = ({ ad }) => {
       }`}
     >
       <div className="c-item-img-con">
-        {!imageLoaded && <div className="image-skeleton"></div>}
+        {!imageLoaded && (
+          <div
+            className="skeleton-loader"
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+          ></div>
+        )}
         <img
-          src={image?.url}
+          src={`${image?.url}?w=50&h=50&fit=cover&auto=format&q=1&dpr=1`}
           alt={title}
           className={`ad-image ${imageLoaded ? "loaded" : "hidden"}`}
           onLoad={() => setImageLoaded(true)}
+          style={{
+            display: imageLoaded ? "block" : "none",
+            transition: "opacity 0.3s ease-in-out",
+            opacity: imageLoaded ? 1 : 0,
+          }}
         />
       </div>
 
       <div className="content-container">
-        {!imageLoaded ? (
-          <div className="text-skeleton">
-            <div className="skeleton skeleton-title"></div>
-            <div className="skeleton skeleton-text"></div>
-            <div className="skeleton skeleton-text d-none d-md-block"></div>
-            <div className="skeleton skeleton-text d-none d-md-block"></div>
+        {!contentLoaded ? (
+          <div>
+            <div
+              className="skeleton-loader"
+              style={{
+                width: "70%",
+                height: "1.5rem",
+                marginBottom: "0.5rem",
+              }}
+            ></div>
+            <div
+              className="skeleton-loader"
+              style={{
+                width: "90%",
+                height: "1rem",
+                marginBottom: "0.5rem",
+              }}
+            ></div>
+            <div
+              className="skeleton-loader d-none d-md-block"
+              style={{
+                width: "60%",
+                height: "1rem",
+                marginBottom: "0.5rem",
+              }}
+            ></div>
           </div>
         ) : (
           <>

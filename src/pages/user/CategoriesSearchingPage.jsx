@@ -233,7 +233,7 @@ const CategoriesSearchingPage = () => {
           }}
         />
         <button
-          className="btn btn-primary"
+          className="btn bg-nav text-light"
           style={{ maxWidth: "100px", flex: "1 1 auto" }}
           onClick={applyFilters}
           disabled={

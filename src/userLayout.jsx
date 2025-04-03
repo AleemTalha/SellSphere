@@ -64,7 +64,7 @@ const userLayout = () => {
 
   const isUser = token && userRole === "user";
   const isAdmin = token && userRole === "admin";
-
+  console.log("this ran")
   return (
     <div>
       <Suspense fallback={<Loading />}>
