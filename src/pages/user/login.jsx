@@ -106,7 +106,7 @@ const login = () => {
     });
 
     document.cookie;
-    console.log(document.cookie);
+    console.log("Cookies setted  : " , document.cookie);
 
     const responseData = await response.json();
     reset();
