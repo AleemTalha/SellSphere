@@ -23,6 +23,11 @@ import Loading from "./components/loading";
 
 function App() {
   const token = getCookie("token");
+  if (!token) {
+    console.error("No cookie named 'token' found.");
+  } else {
+    console.log("Token cookie received:", token);
+  }
   const decodedToken = token ? decodeJWT(token) : null;
   const isTokenValid = decodedToken && decodedToken.exp * 1000 > Date.now();
   const userRole = isTokenValid ? decodedToken.role : null;

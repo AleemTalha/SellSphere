@@ -51,6 +51,11 @@ const decodeJWT = (token) => {
 
 const userLayout = () => {
   const [token, setToken] = useState(getCookie("token"));
+  if (!token) {
+    console.error("No cookie named 'token' found.");
+  } else {
+    console.log("Token cookie received:", token);
+  }
   const [userRole, setUserRole] = useState(
     token ? decodeJWT(token)?.role : null
   );

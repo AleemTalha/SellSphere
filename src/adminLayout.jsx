@@ -20,6 +20,11 @@ const ViewAdDetails = lazy(() => import("./pages/admin/ViewAdDetails"));
 
 const adminLayout = () => {
   const token = getCookie("token");
+  if (!token) {
+    console.error("No cookie named 'token' found.");
+  } else {
+    console.log("Token cookie received:", token);
+  }
   const decodedToken = token ? decodeJWT(token) : null;
   const userRole = decodedToken?.role;
   const isTokenValid = decodedToken && decodedToken.exp * 1000 > Date.now();
