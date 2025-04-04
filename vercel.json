@@ -21,6 +21,10 @@
     {
       "src": "/(.*)",
       "dest": "/index.html"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "https://mern-project-2-production.up.railway.app/api/$1"
     }
   ]
 }
