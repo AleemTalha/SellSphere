@@ -1,5 +1,12 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
-import { Routes, Route, Outlet, Navigate, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Outlet,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import Loading from "./components/loading";
 import ContactButton from "./components/ContactButton/ContactButton";
 
@@ -34,7 +41,6 @@ const decodeJWT = (token) => {
   if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 3) {
-    console.error("Invalid JWT format");
     return null;
   }
   const base64Url = parts[1];
@@ -48,25 +54,49 @@ const userLayout = () => {
   const [userRole, setUserRole] = useState(
     token ? decodeJWT(token)?.role : null
   );
+  const [sessionExpired, setSessionExpired] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateToken = () => {
       const newToken = getCookie("token");
-      if (newToken !== token) {
+      if (!newToken) {
+        if (token) {
+          setSessionExpired(true);
+          setTimeout(() => {
+            setSessionExpired(false);
+            navigate("/login");
+          }, 3000);
+        }
+        setToken(null);
+        setUserRole(null);
+      } else if (newToken !== token) {
         setToken(newToken);
-        setUserRole(newToken ? decodeJWT(newToken)?.role : null);
+        setUserRole(decodeJWT(newToken)?.role);
       }
     };
 
     updateToken();
   }, [location]);
 
+  const handleLogout = () => {
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    setToken(null);
+    setUserRole(null);
+    navigate("/login");
+  };
+
   const isUser = token && userRole === "user";
   const isAdmin = token && userRole === "admin";
-  console.log("this ran")
+
   return (
     <div>
+      {sessionExpired && (
+        <div className="session-expired-message">
+          Session expired. Redirecting to login...
+        </div>
+      )}
       <Suspense fallback={<Loading />}>
         <ContactButton />
         <Routes>
@@ -87,7 +117,7 @@ const userLayout = () => {
             path="/profile/:id"
             element={
               isUser ? (
-                <Profile />
+                <Profile onLogout={handleLogout} />
               ) : token ? (
                 <Forbidden role={userRole} />
               ) : (

@@ -13,7 +13,7 @@ const Reports = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const fetchCalled = useRef(false); 
+  const fetchCalled = useRef(false);
   const [selectedReports, setSelectedReports] = useState([]);
   const [isSelecting, setIsSelecting] = useState(false);
 
@@ -37,7 +37,7 @@ const Reports = () => {
         if (isLoadMore) {
           setLoadingMore(true);
         } else {
-          setLoading(true); 
+          setLoading(true);
         }
 
         const queryParams = new URLSearchParams({ page }).toString();
@@ -85,36 +85,34 @@ const Reports = () => {
   useEffect(() => {
     if (!fetchCalled.current) {
       fetchReports(currentPage);
-      fetchCalled.current = true; 
+      fetchCalled.current = true;
     }
   }, [currentPage, fetchReports]);
 
   const handleLoadMore = useCallback(() => {
     if (currentPage < totalPages) {
-      fetchReports(currentPage + 1, true)
+      fetchReports(currentPage + 1, true);
     }
   }, [currentPage, totalPages, fetchReports]);
 
   const handleRightClick = (e, reportId) => {
     e.preventDefault();
-    if (!isSelecting) {
-      setIsSelecting(true);
-      setSelectedReports([reportId]);
-    } else {
-      setSelectedReports((prev) =>
+    setIsSelecting(true); // Enable selection mode
+    setSelectedReports(
+      (prev) =>
         prev.includes(reportId)
-          ? prev.filter((id) => id !== reportId)
-          : [...prev, reportId]
-      );
-    }
+          ? prev.filter((id) => id !== reportId) // Deselect if already selected
+          : [...prev, reportId] // Add to selection if not already selected
+    );
   };
 
   const handleLeftClick = (reportId) => {
     if (isSelecting) {
-      setSelectedReports((prev) =>
-        prev.includes(reportId)
-          ? prev.filter((id) => id !== reportId)
-          : [...prev, reportId]
+      setSelectedReports(
+        (prev) =>
+          prev.includes(reportId)
+            ? prev.filter((id) => id !== reportId) // Deselect if already selected
+            : [...prev, reportId] // Add to selection if not already selected
       );
     }
   };
@@ -126,7 +124,7 @@ const Reports = () => {
     }
 
     try {
-      setLoading(true);
+      setLoading(true); // Disable delete button
       const response = await fetch(
         "http://localhost:3000/admin/reports/delete-reports",
         {
@@ -145,6 +143,7 @@ const Reports = () => {
           prev.filter((report) => !selectedReports.includes(report._id))
         );
         setSelectedReports([]);
+        setIsSelecting(false);
       } else {
         showToastMessage(false, data.message || "Failed to delete reports.");
       }
@@ -152,8 +151,13 @@ const Reports = () => {
       console.error("Failed to delete reports:", error);
       showToastMessage(false, "An error occurred while deleting reports.");
     } finally {
-      setLoading(false);
+      setLoading(false); // Re-enable delete button
     }
+  };
+
+  const cancelSelection = () => {
+    setIsSelecting(false); // Disable selection mode
+    setSelectedReports([]); // Clear all selected reports
   };
 
   const ReportCard = React.memo(({ report }) => (
@@ -169,14 +173,12 @@ const Reports = () => {
       onClick={() => handleLeftClick(report._id)}
     >
       <div
-        className="border p-3 rounded d-flex flex-column justify-content-between"
-        style={{
-          height: "300px",
-          cursor: "pointer",
-          backgroundColor: selectedReports.includes(report._id)
-            ? "#343a40"
-            : "white",
-        }}
+        className={`border p-3 rounded d-flex flex-column justify-content-between ${
+          isSelecting && selectedReports.includes(report._id)
+            ? "bg-primary text-white"
+            : ""
+        }`}
+        style={{ height: "300px", cursor: "pointer" }}
       >
         <h5 className="text-center">{report.title || "Untitled Report"}</h5>
         <p
@@ -201,12 +203,14 @@ const Reports = () => {
             })}
           </p>
         </div>
-        <button
-          className="bg-nav rounded text-light border-0 px-3 py-1 mt-2"
-          onClick={() => navigate(`/admin/reports/${report._id}`)}
-        >
-          View Details
-        </button>
+        {!isSelecting && (
+          <button
+            className="bg-nav rounded text-light border-0 px-3 py-1 mt-2"
+            onClick={() => navigate(`/admin/reports/${report._id}`)}
+          >
+            View Details
+          </button>
+        )}
       </div>
     </Col>
   ));
@@ -240,11 +244,24 @@ const Reports = () => {
       <Container className="mt-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h2>Reports</h2>
-          {selectedReports.length > 0 && (
-            <button className="btn btn-danger" onClick={deleteSelectedReports}>
-              Delete Selected ({selectedReports.length})
-            </button>
-          )}
+          {isSelecting ? (
+            <div className="d-flex gap-2">
+              <button
+                className="bg-nav rounded text-light border-0 px-3 py-1"
+                onClick={cancelSelection}
+                disabled={loading} // Disable cancel button while loading
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-danger rounded text-light border-0 px-3 py-1"
+                onClick={deleteSelectedReports}
+                disabled={loading || selectedReports.length === 0} // Disable delete button while loading or no selection
+              >
+                Delete ({selectedReports.length})
+              </button>
+            </div>
+          ) : null}
         </div>
         {loading && currentPage === 1 ? (
           <div className="text-center">

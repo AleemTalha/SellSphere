@@ -1,0 +1,90 @@
+.ad-details-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.ad-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.ad-header h1 {
+  font-size: 2.2rem;
+  color: #333;
+}
+
+.ad-category {
+  font-size: 1rem;
+  color: #555;
+}
+
+.ad-body {
+  display: flex;
+  gap: 20px;
+}
+
+.ad-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.ad-info {
+  flex: 1;
+}
+
+.ad-info p {
+  margin: 10px 0;
+  font-size: 1rem;
+  color: #444;
+}
+
+.ad-info strong {
+  color: #222;
+}
+
+.ad-actions {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.status-button,
+.delete-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.status-button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.status-button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.delete-button:hover {
+  background-color: #a71d2a;
+}
+
+.loading,
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+}

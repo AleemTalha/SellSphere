@@ -412,6 +412,17 @@ const PostAd = () => {
                           />
                         </div>
                         <div className="mb-3 flex-grow-1">
+                          <label className="form-label">Area</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Area (e.g., 1200 sqft)"
+                            {...register("area")}
+                            required
+                          />
+                        </div>
+
+                        <div className="mb-3 flex-grow-1">
                           <label className="form-label d-block">
                             Furnished
                           </label>

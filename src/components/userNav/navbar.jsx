@@ -5,29 +5,16 @@ import { toast, ToastContainer } from "react-toastify";
 import "./navbar.css";
 
 const showToastMessage = (success, message) => {
-  if (success) {
-    toast.success(message, {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "dark",
-      newestOnTop: true,
-    });
-  } else {
-    toast.error(message, {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "dark",
-      newestOnTop: true,
-    });
-  }
+  toast[success ? "success" : "error"](message, {
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+    newestOnTop: true,
+  });
 };
 
 const Navbar = ({ user, setUser }) => {
@@ -44,27 +31,17 @@ const Navbar = ({ user, setUser }) => {
     setDropdownOpen((prev) => !prev);
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setIsLoggingOut(true);
-    try {
-      const response = await fetch(`http://localhost:3000/logout`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setUser(null);
-        showToastMessage(true, "Logged out successfully");
-      } else {
-        showToastMessage(false, result.message || "Logout failed");
-      }
-    } catch (error) {
-      showToastMessage(false, "Logout failed: " + error.message);
-    } finally {
-      setIsLoggingOut(false);
-    }
+    const cookies = document.cookie.split("; ");
+    cookies.forEach((cookie) => {
+      const [name] = cookie.split("=");
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+    });
+    setUser(null);
+    showToastMessage(true, "Logged out successfully");
+    navigate("/login", { replace: true });
+    setIsLoggingOut(false);
   };
 
   return (
@@ -94,7 +71,7 @@ const Navbar = ({ user, setUser }) => {
               {dropdownOpen && (
                 <div className="user-dropdown-content">
                   <NavLink
-                  type="button"
+                    type="button"
                     to={`/profile/${user._id}`}
                     state={{ userId: user._id }}
                     className="btn text-dark user-dropdown-link text-black text-decoration-none"
@@ -126,12 +103,12 @@ const Navbar = ({ user, setUser }) => {
             </div>
           ) : (
             <div className="auth-links d-flex">
-              <NavLink
-                to="/login"
+              <button
+                onClick={() => navigate("/login", { replace: true })}
                 className="btn elong transition-all nav-link text-light text-decoration-none"
               >
                 Login
-              </NavLink>
+              </button>
               <NavLink
                 to="/login"
                 className="btn elong transition-all nav-link text-light text-decoration-none"

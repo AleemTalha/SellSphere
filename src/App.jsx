@@ -1,10 +1,9 @@
-import React, { Suspense, lazy, useEffect, useState } from "react";
+import React, { Suspense, lazy } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-  useLocation,
 } from "react-router-dom";
 import "aos/dist/aos.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -22,51 +21,52 @@ const ForbiddenPage = lazy(() => import("./pages/error/Forbidden"));
 import Loading from "./components/loading";
 
 function App() {
-  const [userRole, setUserRole] = useState(null);
-  const [token, setToken] = useState(null);
+  const token = getCookie("token");
+  const decodedToken = token ? decodeJWT(token) : null;
+  const isTokenValid = decodedToken && decodedToken.exp * 1000 > Date.now();
+  const userRole = isTokenValid ? decodedToken.role : null;
+
+  const ProtectedRoute = ({ children }) => {
+    if (!token) {
+      return <ErrorPage />;
+    }
+    if (!isTokenValid) {
+      return <Navigate to="/login" replace />;
+    }
+    return children;
+  };
+
+  const LoginRedirect = () => {
+    if (isTokenValid) {
+      return userRole === "admin" ? (
+        <Navigate to="/admin/dashboard" replace />
+      ) : (
+        <Navigate to="/" replace />
+      );
+    }
+    return <Login />;
+  };
 
   return (
     <Router>
       <Suspense fallback={<Loading />}>
         <ScrollToTop />
-        <RouteHandler setToken={setToken} setUserRole={setUserRole} />
         <Routes>
           <Route path="/*" element={<UserLayout />} />
+          <Route path="/login" element={<LoginRedirect />} />
           <Route
-            path="/login"
+            path="/admin/*"
             element={
-              token ? (
-                userRole === "user" ? (
-                  <Navigate to="/" />
-                ) : userRole === "admin" ? (
-                  <Navigate to="/admin/dashboard" />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Login />
-              )
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
             }
           />
-          <Route path="/admin/*" element={<AdminLayout />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </Suspense>
     </Router>
   );
-}
-
-function RouteHandler({ setToken, setUserRole }) {
-  const location = useLocation();
-
-  useEffect(() => {
-    const currentToken = getCookie("token");
-    setToken(currentToken);
-    const decodedToken = currentToken ? decodeJWT(currentToken) : null;
-    setUserRole(decodedToken?.role);
-  }, [location]);
-
-  return null;
 }
 
 export default App;
