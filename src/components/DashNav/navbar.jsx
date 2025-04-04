@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Navbar.css";
+import "./navbar.css";
 import Categories from "../../data/categories";
 import { useNavigate, NavLink } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
