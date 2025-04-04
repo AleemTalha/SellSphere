@@ -105,6 +105,9 @@ const login = () => {
       body: JSON.stringify(data),
     });
 
+    document.cookie;
+    console.log(document.cookie);
+
     const responseData = await response.json();
     reset();
 
