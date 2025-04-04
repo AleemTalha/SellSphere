@@ -105,8 +105,12 @@ const login = () => {
       body: JSON.stringify(data),
     });
 
-    document.cookie;
-    console.log("Cookies setted  : " , document.cookie);
+    const cookies = response.headers.get("set-cookie");
+    if (cookies) {
+      document.cookie = `token=${
+        cookies.split("token=")[1].split(";")[0]
+      };path=/;secure;SameSite=None`;
+    }
 
     const responseData = await response.json();
     reset();
