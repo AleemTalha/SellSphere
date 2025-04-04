@@ -10,7 +10,7 @@ import {
 import Loading from "./components/loading";
 import ContactButton from "./components/ContactButton/ContactButton";
 
-const Dashboard = lazy(() => import("./pages/user/dashboard/Dashboard"));
+const Dashboard = lazy(() => import("./pages/user/dashboard/dashboard"));
 const Forbidden = lazy(() => import("./pages/error/Forbidden"));
 const PostAd = lazy(() => import("./pages/user/postAd/postAd"));
 const ForgotEmail = lazy(() => import("./pages/user/forgotPassword/forgot"));
