@@ -11,7 +11,7 @@ const CategoryPage = () => {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const API_URI = import.meta.env.VITE_API_URI || "http://localhost:3000";
+        const API_URI = import.meta.env.VITE_API_URL || "http://localhost:3000";
         const endpoint = subcategory
           ? `/ads/${category}/${subcategory}`
           : `/ads/${category}`;
