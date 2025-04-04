@@ -48,6 +48,7 @@ const Navbar = ({ user, setLocation }) => {
   useEffect(() => {
     const fetchCityAndCountry = async (latitude, longitude) => {
       try {
+        console.log("fetching location data from dashNav...");
         const response = await fetch(
           `https://api.bigdatacloud.net/data/reverse-geocode?latitude=${latitude}&longitude=${longitude}&localityLanguage=en&key=${import.meta.env.VITE_GEO_API}`
         );
