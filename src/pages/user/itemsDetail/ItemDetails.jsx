@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Menu from "../../../components/itemMenu/Menu";
+import Menu from "../../../components/itemMenu/menu";
 import "./ItemDetails.css";
 import NavBar from "../../../components/loginNav/navbar";
 import ReportMenu from "../../../components/report/report";

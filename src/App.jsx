@@ -16,6 +16,7 @@ import AdminLayout from "./adminLayout";
 import { getCookie, decodeJWT } from "./utils/auth";
 
 const Login = lazy(() => import("./pages/user/login"));
+
 const ErrorPage = lazy(() => import("./pages/error/ErrorPage"));
 const ForbiddenPage = lazy(() => import("./pages/error/Forbidden"));
 import Loading from "./components/loading";
