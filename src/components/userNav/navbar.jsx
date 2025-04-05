@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, NavLink } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import "./navbar.css";
 
 const showToastMessage = (success, message) => {
@@ -23,18 +24,12 @@ const Navbar = ({ user, setUser }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-  };
-
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
+  const handleImageLoad = () => setImageLoaded(true);
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   const handleLogout = () => {
     setIsLoggingOut(true);
-    const cookies = document.cookie.split("; ");
-    cookies.forEach((cookie) => {
+    document.cookie.split("; ").forEach((cookie) => {
       const [name] = cookie.split("=");
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
     });
@@ -60,7 +55,9 @@ const Navbar = ({ user, setUser }) => {
             >
               <div className="user-info" onClick={toggleDropdown}>
                 <span className="user-user-name">{user.fullname}</span>
-                {!imageLoaded && <div className="user-skeleton-loader"></div>}
+                {!imageLoaded && (
+                  <Skeleton circle={true} height={40} width={40} />
+                )}
                 <img
                   src={user.profileImage?.url || "/images/default.png"}
                   alt="Profile"

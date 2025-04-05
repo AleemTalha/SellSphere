@@ -26,8 +26,8 @@ const Unblocked = lazy(() =>
 const CategoriesSearching = lazy(() =>
   import("./pages/user/CategoriesSearchingPage")
 );
-const ErrorPage = lazy(() => import("./pages/error/ErrorPage"));
 
+const ErrorPage = lazy(() => import("./pages/error/ErrorPage"));
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
