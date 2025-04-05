@@ -26,7 +26,7 @@ const Dashboard = () => {
   const dataSectionRef = useRef(null);
   const [dataFetched, setDataFetched] = useState(false);
 
-  console.log("Cookies: ", document.cookie);
+  // console.log("Cookies: ", document.cookie);
 
   const showToast = (message, flag) => {
     toast[flag ? "success" : "error"](message, {
@@ -56,7 +56,7 @@ const Dashboard = () => {
         });
         const result = await response.json();
         if (response.ok && result.loggedIn) {
-          console.log("user is : ", result.user);
+          // console.log("user is : ", result.user);
           showToast(result.message, true);
           setUser(result.user);
           await new Promise((resolve) => {
@@ -147,8 +147,8 @@ const Dashboard = () => {
         headers: { "Content-Type": "application/json" },
       });
       const result2 = await response2.json();
-      console.log("Error fetching dashboard data:", error);
-      console.log("Response from sample API:", result2);
+      // console.log("Error fetching dashboard data:", error);
+      // console.log("Response from sample API:", result2);
 
       if (response2.ok) {
         showToast(result2.message, result2.success);

@@ -62,11 +62,11 @@ const CategoriesSearchingPage = () => {
 
   useEffect(() => {
     const formattedCategory = unslugify(category);
-    console.log("Formatted Category:", formattedCategory);
+    // console.log("Formatted Category:", formattedCategory);
     const matchedCategory = categoriesData.find(
       (cat) => cat.category.toLowerCase() === formattedCategory.toLowerCase()
     );
-    console.log("Matched Category:", matchedCategory);
+    // console.log("Matched Category:", matchedCategory);
 
     if (matchedCategory) {
       setSubcategories(matchedCategory.items);
