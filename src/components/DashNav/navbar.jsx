@@ -1,124 +1,135 @@
 import React, { useState, useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
 import "./navbar.css";
 import Categories from "../../data/categories";
-import { useNavigate, NavLink } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
+import slugify from "slugify";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import slugify from "slugify";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
-const Navbar = ({ user, setLocation }) => {
-  const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+const Navbar = ({ setLocation }) => {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
-  const [showLocation, setShowLocation] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [locationFetched, setLocationFetched] = useState(false);
   const [retryingLocation, setRetryingLocation] = useState(false);
+  const [permissionDeniedToastShown, setPermissionDeniedToastShown] =
+    useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const locationTimeoutRef = useRef(null);
 
   const showToast = (success, message) => {
-    if (success) {
-      toast.success(message, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-        newestOnTop: true,
-      });
-    } else {
-      toast.error(message, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-        newestOnTop: true,
-      });
+    const config = {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+      newestOnTop: true,
+    };
+    success ? toast.success(message, config) : toast.error(message, config);
+  };
+
+  const fetchCityAndCountry = async (latitude, longitude) => {
+    try {
+      const response = await fetch(
+        `https://api.bigdatacloud.net/data/reverse-geocode?latitude=${latitude}&longitude=${longitude}&localityLanguage=en&key=${
+          import.meta.env.VITE_GEO_API
+        }`
+      );
+      const data = await response.json();
+      setCity(data.city || data.locality || "");
+      setCountry(data.countryName || "");
+    } catch (error) {
+      showToast(false, "Error fetching location data.");
     }
   };
 
-  useEffect(() => {
-    const fetchCityAndCountry = async (latitude, longitude) => {
-      try {
-        const response = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode?latitude=${latitude}&longitude=${longitude}&localityLanguage=en&key=${
-            import.meta.env.VITE_GEO_API
-          }`
-        );
-        const data = await response.json();
-        setCity(data.city || data.locality || "");
-        setCountry(data.countryName || "");
-      } catch (error) {}
-    };
+  const updateLocation = (latitude, longitude) => {
+    setLocation?.({ latitude, longitude });
+    localStorage.setItem(
+      "userLocation",
+      JSON.stringify({ latitude, longitude })
+    );
+    fetchCityAndCountry(latitude, longitude);
+  };
 
-    const updateLocation = (latitude, longitude) => {
-      if (typeof setLocation === "function") {
-        setLocation({ latitude, longitude });
-      }
-      localStorage.setItem(
-        "userLocation",
-        JSON.stringify({ latitude, longitude })
-      );
-      fetchCityAndCountry(latitude, longitude);
-    };
+  const areCoordinatesDifferent = (coord1, coord2) => {
+    const threshold = 0.2;
+    return (
+      Math.abs(coord1.latitude - coord2.latitude) > threshold ||
+      Math.abs(coord1.longitude - coord2.longitude) > threshold
+    );
+  };
 
-    const getLocationFromBrowser = () => {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            updateLocation(latitude, longitude);
-            setLocationFetched(true);
-          },
-          (error) => {
-            if (error.code === error.PERMISSION_DENIED) {
-              showToast(
-                "Permission denied. Please allow location access.",
-                false
-              );
-            }
+  const getLocationFromBrowser = () => {
+    setIsFetchingLocation(true);
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const storedLocation = JSON.parse(
+            localStorage.getItem("userLocation")
+          );
+
+          if (
+            !storedLocation ||
+            areCoordinatesDifferent(storedLocation, { latitude, longitude })
+          ) {
+            localStorage.setItem(
+              "userLocation",
+              JSON.stringify({ latitude, longitude })
+            );
             setCity("");
             setCountry("");
+            fetchCityAndCountry(latitude, longitude);
+            setLocation?.({ latitude, longitude });
+            setLocationFetched(true);
+          } else {
+            const storedCity = localStorage.getItem("city");
+            const storedCountry = localStorage.getItem("country");
+
+            if (!storedCity || !storedCountry) {
+              fetchCityAndCountry(latitude, longitude);
+            } else {
+              setCity(storedCity);
+              setCountry(storedCountry);
+            }
             setLocationFetched(true);
           }
-        );
-      } else {
-        showToast("Geolocation is not supported by your browser.", false);
-        setCity("No location");
-        setCountry("");
-        setLocationFetched(true);
-      }
-    };
-
-    if (!locationFetched) {
-      const storedLocation = JSON.parse(localStorage.getItem("userLocation"));
-
-      if (storedLocation) {
-        const { latitude, longitude } = storedLocation;
-        fetchCityAndCountry(latitude, longitude);
-        setLocationFetched(true);
-      } else if (user?.location?.coordinates?.length > 0) {
-        const [longitude, latitude] = user.location.coordinates;
-        updateLocation(latitude, longitude);
-        setLocationFetched(true);
-      } else {
-        getLocationFromBrowser();
-      }
+          setIsFetchingLocation(false);
+        },
+        (error) => {
+          if (
+            error.code === error.PERMISSION_DENIED &&
+            !permissionDeniedToastShown
+          ) {
+            showToast(
+              false,
+              "Permission denied. Please allow location access."
+            );
+            setPermissionDeniedToastShown(true);
+          }
+          setCity("");
+          setCountry("");
+          setLocationFetched(true);
+          setIsFetchingLocation(false);
+        }
+      );
+    } else {
+      showToast(false, "Geolocation is not supported by your browser.");
+      setCity("No location");
+      setCountry("");
+      setLocationFetched(true);
+      setIsFetchingLocation(false);
     }
-
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [user, setLocation, locationFetched]);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -143,126 +154,192 @@ const Navbar = ({ user, setLocation }) => {
     }
   };
 
-  const handleLocationClick = () => {
-    setShowLocation(true);
-    if (locationTimeoutRef.current) {
-      clearTimeout(locationTimeoutRef.current);
+  useEffect(() => {
+    getLocationFromBrowser();
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const storedLocation = JSON.parse(localStorage.getItem("userLocation"));
+    const storedCity = localStorage.getItem("city");
+    const storedCountry = localStorage.getItem("country");
+
+    if (storedLocation) {
+      const { latitude, longitude } = storedLocation;
+
+      if (
+        !storedCity ||
+        !storedCountry ||
+        areCoordinatesDifferent(storedLocation, { latitude, longitude })
+      ) {
+        localStorage.setItem(
+          "userLocation",
+          JSON.stringify({ latitude, longitude })
+        );
+        fetchCityAndCountry(latitude, longitude);
+      } else {
+        setCity(storedCity);
+        setCountry(storedCountry);
+      }
+      setLocationFetched(true);
+    } else {
+      getLocationFromBrowser();
     }
-    locationTimeoutRef.current = setTimeout(() => {
-      setShowLocation(false);
-    }, 3000);
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (city && country) {
+      localStorage.setItem("city", city);
+      localStorage.setItem("country", country);
+    }
+  }, [city, country]);
+
+  const handleLocationHover = () => {
+    if (!isMobile) setShowTooltip(true);
+  };
+
+  const handleLocationLeave = () => {
+    if (!isMobile) setShowTooltip(false);
+  };
+
+  const handleLocationClick = () => {
+    if (isMobile) setShowTooltip(!showTooltip);
   };
 
   useEffect(() => {
-    return () => {
-      if (locationTimeoutRef.current) {
-        clearTimeout(locationTimeoutRef.current);
-      }
-    };
-  }, []);
+    if (isMobile && showTooltip) {
+      setTimeout(() => setShowTooltip(false), 5000);
+    }
+  }, [isMobile, showTooltip]);
 
   return (
     <>
-      <nav
-        className="navbar bg-light d-flex justify-content-between"
-        style={{ zIndex: 1 }}
+      <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm position-relative"
+      style={{ zIndex: 5 }}
       >
-        <div className="item-1" ref={menuRef}>
-          <div className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? (
-              <div className="transition-all">
-                <span className="text-danger fw-bold">
-                  Close Categories &nbsp;
-                </span>
-                <i className="bi bi-x-lg text-danger"></i>
+        <div className="container-fluid m-0 p-0 justify-content-between">
+          <div className="item-1" ref={menuRef}>
+            <div className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? (
+                <div className="transition-all">
+                  <span className="text-danger fw-bold">
+                    Close Categories &nbsp;
+                  </span>
+                  <i className="bi bi-x-lg text-danger"></i>
+                </div>
+              ) : (
+                <>
+                  <span className="text-success fw-bold">
+                    Expand Categories &nbsp;
+                  </span>
+                  <i className="bi bi-chevron-down text-dark"></i>
+                </>
+              )}
+            </div>
+
+            <div className={`drop-down ${isOpen ? "show" : ""}`}>
+              <div className="category-grid row text-start">
+                {Categories.map((categoryData, i) => (
+                  <div
+                    className="category col-lg-3 col-md-4 col-6"
+                    key={i}
+                  >
+                    <div className="category-title">
+                      <NavLink
+                        to={`/category/${slugify(categoryData.category)}`}
+                        className="text-decoration-none category-title elong btn p-0 transition-all"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {categoryData.category}
+                      </NavLink>
+                    </div>
+                    <div className="category-items">
+                      {categoryData.items.map((item, idx) => (
+                        <div key={idx}>
+                          <NavLink
+                            to={`/category/${slugify(
+                              categoryData.category
+                            )}/${slugify(item)}`}
+                            type="button"
+                            className="text-decoration-none category-items elong p-0 transition-all"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {item}
+                          </NavLink>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ) : (
-              <>
-                <span className="text-success fw-bold">
-                  Expand Categories &nbsp;
-                </span>
-                <i className="bi bi-chevron-down text-dark"></i>
-              </>
-            )}
+            </div>
           </div>
 
-          <div className={`drop-down ${isOpen ? "show" : ""}`}>
-            <div className="category-grid row text-start">
-              {Categories.map((categoryData, i) => (
-                <div className="category col-lg-3 col-md-4 col-6" key={i}>
-                  <div className="category-title">
-                    <NavLink
-                      to={`/category/${slugify(categoryData.category)}`}
-                      className="text-decoration-none category-title elong btn p-0 transition-all"
-                      onClick={() => setIsOpen(false)}
+          <div className="d-flex align-items-center">
+            <div
+              className="position-relative me-2"
+              onMouseEnter={handleLocationHover}
+              onMouseLeave={handleLocationLeave}
+              onClick={handleLocationClick}
+              style={{ cursor: "pointer", zIndex: 5 }}
+            >
+              {city && country ? (
+                <>
+                  <i className="bi bi-geo-alt-fill text-success fs-4"></i>
+                  {showTooltip && (
+                    <div
+                      className="position-absolute bg-light border rounded p-2"
+                      style={{
+                        top: "100%",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        zIndex: 5,
+                      }}
                     >
-                      {categoryData.category}
-                    </NavLink>
-                  </div>
-                  <div className="category-items">
-                    {categoryData.items.map((item, idx) => (
-                      <div key={idx}>
-                        <NavLink
-                          to={`/category/${slugify(
-                            categoryData.category
-                          )}/${slugify(item)}`}
-                          type="button"
-                          className="text-decoration-none category-items elong p-0 transition-all"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {item}
-                        </NavLink>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                      <span className="text-dark">
+                        {city}, {country}
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={retryLocation}
+                  className="btn btn-sm btn-danger"
+                  disabled={retryingLocation || isFetchingLocation}
+                >
+                  {retryingLocation || isFetchingLocation ? (
+                    <div
+                      className="spinner-border spinner-border-sm text-light"
+                      role="status"
+                    >
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  ) : (
+                    <i className="bi bi-geo-alt-fill"></i>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
-
-        <div
-  className="location-info"
-  style={{ minHeight: "20px", maxHeight: "20px" }}
->
-  {isMobile ? (
-    <div className="position-relative">
-      <i
-        className={`bi ${
-          city && country ? "bi-geo-alt-fill text-success" : "bi-geo-alt text-danger"
-        } fs-4 cursor-pointer`}
-        onClick={handleLocationClick}
-      ></i>
-
-      {showLocation && city && country && (
-        <div
-          className="dropdown-menu show position-absolute mt-1 p-2"
-          style={{ zIndex: 999 }}
-        >
-          <span className="fw-bold text-nav">
-            {city}, {country}
-          </span>
-        </div>
-      )}
-    </div>
-  ) : city && country ? (
-    <span className="fw-bold text-dark">
-      {city}, {country}
-    </span>
-  ) : (
-    !retryingLocation && (
-      <button
-        onClick={retryLocation}
-        className="btn btn-danger py-0 px-2 m-0"
-      >
-        No Location
-      </button>
-    )
-  )}
-</div>
-
       </nav>
-      <ToastContainer />
+      <ToastContainer
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick={true}
+        pauseOnHover={true}
+        draggable={true}
+        theme="dark"
+        newestOnTop={true}
+      />
     </>
   );
 };

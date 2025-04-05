@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import "./card.css";
 import { NavLink } from "react-router-dom";
 import slugify from "slugify";
-import ReportMenu from "../report/report";
 
 const Card = ({ ad }) => {
   const [locationInfo, setLocationInfo] = useState({
@@ -11,8 +10,6 @@ const Card = ({ ad }) => {
   });
   const [timeAgo, setTimeAgo] = useState("");
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [isImageVisible, setIsImageVisible] = useState(false);
-  const imageRef = useRef(null);
 
   useEffect(() => {
     const fetchLocationInfo = async () => {
@@ -54,45 +51,21 @@ const Card = ({ ad }) => {
     calculateTimeAgo();
   }, [ad]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsImageVisible(true); // Set image visibility when the card enters the viewport
-          observer.disconnect(); // Disconnect observer after the image is set to load
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (imageRef.current) {
-      observer.observe(imageRef.current);
-    }
-
-    return () => {
-      if (imageRef.current) {
-        observer.unobserve(imageRef.current);
-      }
-    };
-  }, []);
-
   return (
     <div className="d-card">
-      <div className="d-card-image-wrapper" ref={imageRef}>
+      <div className="d-card-image-wrapper">
         {!isImageLoaded && <div className="skeleton skeleton-image"></div>}
-        {isImageVisible && (
-          <img
-            src={`${ad.image.url}?w=300&h=300&fit=cover&auto=format&f_auto&q_auto:low&dpr=2`}
-            alt={ad.title}
-            className="d-card-image"
-            onLoad={() => setIsImageLoaded(true)}
-            style={{
-              display: isImageLoaded ? "block" : "none",
-              filter: isImageLoaded ? "none" : "blur(10px)",
-              transition: "filter 0.2s ease-in-out",
-            }}
-          />
-        )}
+        <img
+          src={`${ad.image.url}?w=200&h=200&fit=cover&auto=format&f_auto&q=1&dpr=1`}
+          alt={ad.title}
+          className="d-card-image"
+          onLoad={() => setIsImageLoaded(true)}
+          style={{
+            display: isImageLoaded ? "block" : "none",
+            filter: isImageLoaded ? "none" : "blur(10px)",
+            transition: "filter 0.2s ease-in-out",
+          }}
+        />
       </div>
       <div className="d-card-body">
         <h2 className="d-card-price">
@@ -130,17 +103,15 @@ const Card = ({ ad }) => {
         </div>
         <div className="d-flex justify-content-center align-items-center mt-2">
           {isImageLoaded ? (
-            <>
-              <NavLink
-                type="button"
-                className="rounded transition-all text-decoration-none btn-d-card mt-2 px-3 py-1 bg-transparent text-nav border border-dark border-2"
-                to={`/item-id/${ad._id}/${slugify(ad.category, {
-                  lower: true,
-                })}/`}
-              >
-                View Details
-              </NavLink>
-            </>
+            <NavLink
+              type="button"
+              className="rounded transition-all text-decoration-none btn-d-card mt-2 px-3 py-1 bg-transparent text-nav border border-dark border-2"
+              to={`/item-id/${ad._id}/${slugify(ad.category, {
+                lower: true,
+              })}/`}
+            >
+              View Details
+            </NavLink>
           ) : (
             <div
               className="skeleton skeleton-button"

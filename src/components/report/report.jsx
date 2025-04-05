@@ -26,7 +26,6 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
   const [formError, setFormError] = useState("");
   const reportFormRef = useRef(null);
 
-  // **Disable Scroll Bar Visibility on Report Form Open**
   useEffect(() => {
     if (showReportForm) {
       document.body.classList.add("report-form-open");
@@ -39,7 +38,6 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
     };
   }, [showReportForm]);
 
-  // Close the form if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -126,7 +124,7 @@ const ReportMenu = ({ itemId, title, createdBy, type, postedBy, text }) => {
   return (
     <>
       <button
-        className="menu-button bg-nav"
+        className="menu-button bg-nav p-1"
         onClick={() => setShowReportForm(true)}
       >
         {text ? text : "report"}

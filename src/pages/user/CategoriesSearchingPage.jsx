@@ -104,9 +104,6 @@ const CategoriesSearchingPage = () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
         },
         method: "GET",
       });
@@ -167,6 +164,16 @@ const CategoriesSearchingPage = () => {
       showToast("Last price cannot be less than start price!", false);
       return;
     }
+
+    // Update subcategories dynamically
+    if (selectedSubcategory && !subcategories.includes(selectedSubcategory)) {
+      setSubcategories((prevSubcategories) => [
+        ...prevSubcategories,
+        selectedSubcategory,
+      ]);
+      showToast(`Subcategory "${selectedSubcategory}" added!`, true);
+    }
+
     setFilters({
       ...tempFilters,
       subcategory: selectedSubcategory,
@@ -186,7 +193,7 @@ const CategoriesSearchingPage = () => {
           value={selectedSubcategory}
           onChange={(e) => setSelectedSubcategory(e.target.value)}
         >
-          <option value="">Select Subcategory</option>
+          <option value="">Select All</option>
           {subcategories.map((subcat, index) => (
             <option key={index} value={subcat}>
               {subcat}
@@ -199,20 +206,9 @@ const CategoriesSearchingPage = () => {
           style={{ maxWidth: "200px", flex: "1 1 auto" }}
           placeholder="Start Price"
           value={tempFilters.startPrice}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (
-              tempFilters.lastPrice &&
-              Number(value) > Number(tempFilters.lastPrice)
-            ) {
-              showToast(
-                "Start price cannot be greater than last price!",
-                false
-              );
-              return;
-            }
-            setTempFilters({ ...tempFilters, startPrice: value });
-          }}
+          onChange={(e) =>
+            setTempFilters({ ...tempFilters, startPrice: e.target.value })
+          }
         />
         <input
           type="number"
@@ -220,22 +216,24 @@ const CategoriesSearchingPage = () => {
           style={{ maxWidth: "200px", flex: "1 1 auto" }}
           placeholder="Last Price"
           value={tempFilters.lastPrice}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (
-              tempFilters.startPrice &&
-              Number(value) < Number(tempFilters.startPrice)
-            ) {
-              showToast("Last price cannot be less than start price!", false);
-              return;
-            }
-            setTempFilters({ ...tempFilters, lastPrice: value });
-          }}
+          onChange={(e) =>
+            setTempFilters({ ...tempFilters, lastPrice: e.target.value })
+          }
         />
         <button
           className="btn bg-nav text-light"
           style={{ maxWidth: "100px", flex: "1 1 auto" }}
-          onClick={applyFilters}
+          onClick={() => {
+            if (
+              tempFilters.startPrice &&
+              tempFilters.lastPrice &&
+              Number(tempFilters.lastPrice) < Number(tempFilters.startPrice)
+            ) {
+              showToast("Last price cannot be less than start price!", false);
+              return;
+            }
+            applyFilters();
+          }}
           disabled={
             tempFilters.startPrice === filters.startPrice &&
             tempFilters.lastPrice === filters.lastPrice &&

@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./menu.css";
 
-const Menu = ({ category, phoneNumber }) => {
+const Menu = ({ category, phoneNumber, subcategory }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const formattedPhoneNumber = phoneNumber?.replace(/^0/, "+92");
@@ -32,7 +32,7 @@ const Menu = ({ category, phoneNumber }) => {
       </button>
 
       <NavLink
-        to={`/items/${category}`}
+        to={`/category/${category ? category : ""}${subcategory ? `/${subcategory}` : ""}`}
         className="menu-item"
         title="View More Items"
         onClick={(e) => e.stopPropagation()}

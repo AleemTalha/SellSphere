@@ -53,7 +53,7 @@ const Content = (props) => {
   }, [currentSlide]);
 
   const scrollMore = () => {
-    window.scrollBy({ top: 400, behavior: "smooth" });
+    window.scrollBy({ top: 800, behavior: "smooth" });
   };
 
   const postAd = () => {
@@ -83,15 +83,15 @@ const Content = (props) => {
               <div className="border-text text-light scale-in mx-0 px-0">
                 <h2 className="p-0 m-0">{slides[currentSlide].heading}</h2>
                 <p className="p-0 m-0">{slides[currentSlide].text}</p>
-                <div className="button-container pt-3 d-flex justify-content-center gap-2 gap-sm-4">
+                <div className="button-container pt-3 d-flex justify-content-center gap-2 gap-sm-4 pb-3">
                   <button
-                    className="rounded border px-1 py-1 bg-transparent text-light border"
+                    className="rounded border px-3 py-2 bg-transparent text-light border"
                     onClick={scrollMore}
                   >
                     Explore More
                   </button>
                   <button
-                    className="rounded border bg-nav text-light  cursor-pointer"
+                    className="rounded px-3 py-2 border bg-nav text-light  cursor-pointer"
                     onClick={postAd}
                     style={{ zIndex: 2 }}
                   >
@@ -100,10 +100,10 @@ const Content = (props) => {
                 </div>
               </div>
               <div className="carousel-buttons">
-                <button onClick={prevSlide} className="prev-btn">
+                <button onClick={prevSlide} className="prev-btn border">
                   ❮
                 </button>
-                <button onClick={nextSlide} className="next-btn">
+                <button onClick={nextSlide} className="next-btn border">
                   ❯
                 </button>
               </div>
@@ -111,7 +111,7 @@ const Content = (props) => {
           </div>
         </div>
       </div>
-      <div className="search-container p-5">
+      <div className="search-container pt-5 px-1">
         <Search />
       </div>
       <div className="categories-container">

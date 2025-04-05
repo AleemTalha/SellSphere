@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import slugify from "slugify";
 import Menu from "../../../components/itemMenu/menu";
 import "./ItemDetails.css";
 import NavBar from "../../../components/loginNav/navbar";
@@ -82,7 +83,9 @@ const ItemDetails = () => {
           <>
             <Menu
               category={itemData.category}
+              subcategory ={slugify(itemData.subCategory)}
               phoneNumber={itemData.contactNumber}
+
             />
             <div className="row">
               <div className="col-md-6 d-flex justify-content-center align-items-center">

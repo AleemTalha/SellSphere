@@ -56,7 +56,7 @@ const Dashboard = () => {
         });
         const result = await response.json();
         if (response.ok && result.loggedIn) {
-          console.log("user is : " , result.user);
+          console.log("user is : ", result.user);
           showToast(result.message, true);
           setUser(result.user);
           await new Promise((resolve) => {
@@ -83,10 +83,10 @@ const Dashboard = () => {
           const { latitude, longitude } = JSON.parse(storedLocation);
           setLatitude(latitude);
           setLongitude(longitude);
-          console.log("Location fetched from localStorage:", {
-          latitude,
-          longitude,
-          });
+          // console.log("Location fetched from localStorage:", {
+          // latitude,
+          // longitude,
+          // });
           return { latitude, longitude };
         } else {
           // console.error("No location found in localStorage.");
@@ -163,28 +163,13 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    const handleIntersection = (entries) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && !dataFetched) {
+    const fetchData = async () => {
+      if (!dataFetched) {
         setDataFetched(true);
-        fetchDashboardData();
+        await fetchDashboardData();
       }
     };
-
-    const observer = new IntersectionObserver(handleIntersection, {
-      root: null,
-      threshold: 0.1,
-    });
-
-    if (dataSectionRef.current) {
-      observer.observe(dataSectionRef.current);
-    }
-
-    return () => {
-      if (dataSectionRef.current) {
-        observer.unobserve(dataSectionRef.current);
-      }
-    };
+    fetchData();
   }, [dataFetched]);
 
   const handleScroll = () => {
@@ -270,9 +255,6 @@ const Dashboard = () => {
                   <h2>Latest Listings</h2>
                   <p className="text-muted">Explore the latest ads </p>
                 </div>
-                <Link to="/categories/recent-ads" className="view-more-link">
-                  View More <i className="bi bi-arrow-right"></i>
-                </Link>
               </div>
             </div>
             <div className="d-card-wrapper">
@@ -306,14 +288,6 @@ const Dashboard = () => {
                     <h2>{category.title}</h2>
                     <p className="text-muted">Explore {category.title}</p>
                   </div>
-                  <Link
-                    to={`/categories/${slugify(category.title, {
-                      lower: true,
-                    })}`}
-                    className="view-more-link"
-                  >
-                    View More <i className="bi bi-arrow-right"></i>
-                  </Link>
                 </div>
                 <div className="d-card-wrapper">
                   <div className="d-card-container">

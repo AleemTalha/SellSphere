@@ -17,7 +17,6 @@ const SearchBar = () => {
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const recognitionRef = useRef(null);
   const suggestionsRef = useRef(null);
   const navigate = useNavigate();
@@ -79,16 +78,12 @@ const SearchBar = () => {
     setQuery(item.name);
     setSelectedItem(item);
     setFilteredItems([]);
-    setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      if (item.type === "item") {
-        navigate(`/category/${slugify(item.category)}/${slugify(item.name)}`);
-      } else if (item.type === "category") {
-        navigate(`/category/${slugify(item.name)}`);
-      }
-    }, 2000);
+    if (item.type === "item") {
+      navigate(`/category/${slugify(item.category)}/${slugify(item.name)}`);
+    } else if (item.type === "category") {
+      navigate(`/category/${slugify(item.name)}`);
+    }
   };
 
   const handleFocus = () => {
@@ -223,42 +218,33 @@ const SearchBar = () => {
 
     if (results.length > 0) {
       const selectedItem = results[0];
-      setIsLoading(true);
-
-      setTimeout(() => {
-        setIsLoading(false);
-        if (selectedItem.type === "category") {
-          navigate(`/category/${slugify(selectedItem.name)}`);
-        } else if (selectedItem.type === "item") {
-          navigate(
-            `/category/${slugify(selectedItem.category)}/${slugify(
-              selectedItem.name
-            )}`
-          );
-        }
-      }, 2000);
+      if (selectedItem.type === "category") {
+        navigate(`/category/${slugify(selectedItem.name)}`);
+      } else if (selectedItem.type === "item") {
+        navigate(
+          `/category/${slugify(selectedItem.category)}/${slugify(
+            selectedItem.name
+          )}`
+        );
+      }
     } else {
       toast.error("No matching categories or items found.");
     }
   };
 
   return (
-    <div className="search-container">
+    <div className="search-container ">
       <div className="search-bar-wrapper">
-        {isLoading ? (
-          <div className="loading-indicator">Loading...</div>
-        ) : (
-          <input
-            type="text"
-            placeholder="Search categories or items..."
-            value={query}
-            onChange={handleSearch}
-            onKeyDown={handleKeyDown}
-            onFocus={handleFocus}
-            onBlur={() => setIsFocused(false)}
-            className="search-input"
-          />
-        )}
+        <input
+          type="text"
+          placeholder="Search categories or items..."
+          value={query}
+          onChange={handleSearch}
+          onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
+          onBlur={() => setIsFocused(false)}
+          className="search-input"
+        />
         <div className="search-icons">
           <button
             onClick={startListening}
@@ -266,11 +252,7 @@ const SearchBar = () => {
           >
             <i className={`bi ${isListening ? "bi-mic-fill" : "bi-mic"}`}></i>
           </button>
-          <button
-            onClick={handleSearchClick}
-            className="search-button"
-            disabled={isLoading}
-          >
+          <button onClick={handleSearchClick} className="search-button">
             <i className="bi bi-search"></i>
           </button>
         </div>

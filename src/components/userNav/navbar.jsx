@@ -66,7 +66,9 @@ const Navbar = ({ user, setUser }) => {
                 />
               </div>
               {dropdownOpen && (
-                <div className="user-dropdown-content">
+                <div className="user-dropdown-content"
+                style={{ zIndex: 10, overflow:"hidden" }}
+                >
                   <NavLink
                     type="button"
                     to={`/profile/${user._id}`}
