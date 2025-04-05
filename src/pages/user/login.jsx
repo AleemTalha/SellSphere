@@ -463,7 +463,7 @@ const login = () => {
                         <h3 className="text-center mb-3 pt-3">
                           OTP Verification
                         </h3>
-
+                        <p>If you didn’t receive this, please check your spam or junk folder.</p>
                         <div className="mb-3">
                           <label htmlFor="otp" className="form-label">
                             OTP
